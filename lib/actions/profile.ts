@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireUser, userNeedsProfile } from "../auth";
+import {
+  requireCompleteUser,
+  requireUser,
+  userNeedsProfile,
+} from "../auth";
 import { supabase } from "../supabase";
 
 export type ProfileState = {
@@ -54,7 +58,7 @@ export async function savePixKey(
   _prev: ProfileState,
   formData: FormData
 ): Promise<ProfileState> {
-  const user = await requireUser();
+  const user = await requireCompleteUser();
   const pixKey = normalizePixKey((formData.get("pix_key") as string) ?? "");
 
   if (!pixKey) {
@@ -76,6 +80,6 @@ export async function savePixKey(
 }
 
 export async function skipPixOnboarding(): Promise<void> {
-  await requireUser();
+  await requireCompleteUser();
   redirect("/");
 }

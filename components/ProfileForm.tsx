@@ -15,12 +15,14 @@ const initialState: ProfileState = {};
 interface ProfileFormProps {
   defaultName?: string;
   defaultPixKey?: string;
+  needsProfile?: boolean;
   step?: "pix";
 }
 
 export function ProfileForm({
   defaultName = "",
   defaultPixKey = "",
+  needsProfile = false,
   step,
 }: ProfileFormProps) {
   const [profileState, profileAction, profilePending] = useActionState(
@@ -107,12 +109,18 @@ export function ProfileForm({
             {CRICKET_ICON}
           </div>
           <h1 className={theme.heading}>
-            {defaultName ? "Seu perfil" : "Como você quer aparecer?"}
+            {needsProfile
+              ? "Escolha seu nome"
+              : defaultName
+                ? "Seu perfil"
+                : "Como você quer aparecer?"}
           </h1>
           <p className={`mt-1 ${theme.subheading}`}>
-            {defaultName
-              ? "Atualize seu nome e chave Pix para receber apostas."
-              : "Este nome aparece no ranking e nos palpites do bolão."}
+            {needsProfile
+              ? "O nome é obrigatório para entrar no bolão. Ele aparece no ranking e nos palpites."
+              : defaultName
+                ? "Atualize seu nome e chave Pix para receber apostas."
+                : "Este nome aparece no ranking e nos palpites do bolão."}
           </p>
         </div>
 
@@ -120,7 +128,7 @@ export function ProfileForm({
           <form action={profileAction} className="space-y-4">
             <div>
               <label htmlFor="name" className={theme.label}>
-                Seu nome no bolão
+                Seu nome no bolão {needsProfile && "(obrigatório)"}
               </label>
               <input
                 id="name"
@@ -135,7 +143,7 @@ export function ProfileForm({
               />
             </div>
 
-            {defaultName && (
+            {!needsProfile && defaultName && (
               <div>
                 <label htmlFor="pix_key" className={theme.label}>
                   Chave Pix (opcional)
@@ -166,9 +174,11 @@ export function ProfileForm({
             >
               {profilePending
                 ? "Salvando..."
-                : defaultName
-                  ? "Salvar"
-                  : "Continuar"}
+                : needsProfile
+                  ? "Continuar para o bolão"
+                  : defaultName
+                    ? "Salvar"
+                    : "Continuar"}
             </button>
           </form>
         </div>

@@ -6,7 +6,7 @@ import {
   getBetLockMessage,
   getNextBettableMatchId,
 } from "../betting";
-import { requireUser } from "../auth";
+import { requireCompleteUser } from "../auth";
 import { supabase } from "../supabase";
 
 export type PredictionState = {
@@ -18,7 +18,7 @@ export async function savePrediction(
   _prev: PredictionState,
   formData: FormData
 ): Promise<PredictionState> {
-  const user = await requireUser();
+  const user = await requireCompleteUser();
   const matchId = formData.get("match_id") as string;
   const homeScore = parseInt(formData.get("home_score") as string, 10);
   const awayScore = parseInt(formData.get("away_score") as string, 10);

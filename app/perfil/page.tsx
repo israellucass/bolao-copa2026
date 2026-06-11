@@ -11,17 +11,17 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
+  const needsProfile = userNeedsProfile(user);
   const { step } = await searchParams;
-  if (step === "pix" && userNeedsProfile(user)) {
-    redirect("/perfil");
-  }
+  const pixStep = !needsProfile && step === "pix" ? "pix" : undefined;
 
   return (
     <AppShell user={user}>
       <ProfileForm
         defaultName={user.name ?? ""}
         defaultPixKey={user.pix_key ?? ""}
-        step={step === "pix" ? "pix" : undefined}
+        needsProfile={needsProfile}
+        step={pixStep}
       />
     </AppShell>
   );

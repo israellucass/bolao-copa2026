@@ -23,9 +23,10 @@ export async function getRanking(): Promise<RankingEntry[]> {
   }
 
   const sorted = users
+    .filter((user) => user.name?.trim() && user.name.trim().length >= 2)
     .map((user) => ({
       user_id: user.id,
-      name: user.name,
+      name: user.name!.trim(),
       total_points: totals.get(user.id) ?? 0,
     }))
     .sort((a, b) => b.total_points - a.total_points);

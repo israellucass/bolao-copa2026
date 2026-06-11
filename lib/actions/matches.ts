@@ -1,13 +1,13 @@
 "use server";
 
 import { enrichMatchesWithBetting } from "../betting";
-import { requireUser } from "../auth";
+import { requireCompleteUser } from "../auth";
 import { getMatchWinnersMap } from "../match-winners";
 import { supabase } from "../supabase";
 import type { MatchWithMeta } from "../types";
 
 export async function getMatchesForUser(): Promise<MatchWithMeta[]> {
-  const user = await requireUser();
+  const user = await requireCompleteUser();
 
   const { data: matches, error } = await supabase
     .from("matches")

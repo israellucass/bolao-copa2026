@@ -66,7 +66,7 @@ export async function requireCompleteUser(): Promise<User> {
 }
 
 export async function requireAdmin(): Promise<User> {
-  const user = await requireUser();
+  const user = await requireCompleteUser();
   if (!user.is_admin) throw new Error("Acesso negado");
   return user;
 }

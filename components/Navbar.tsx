@@ -6,9 +6,10 @@ import type { User } from "@/lib/types";
 
 interface NavbarProps {
   user: User;
+  needsProfile?: boolean;
 }
 
-export function Navbar({ user }: NavbarProps) {
+export function Navbar({ user, needsProfile = false }: NavbarProps) {
   return (
     <header
       className="sticky top-0 z-40 border-b border-stone-800 bg-stone-950/95 shadow-lg shadow-black/20 backdrop-blur-md safe-top safe-x"
@@ -29,9 +30,11 @@ export function Navbar({ user }: NavbarProps) {
 
         <div className="flex shrink-0 items-center gap-2">
           <div className="rounded-full bg-stone-900 px-3 py-1.5 text-right ring-1 ring-stone-800">
-            <p className="text-[10px] text-stone-500">Olá,</p>
+            <p className="text-[10px] text-stone-500">
+              {needsProfile ? "Cadastro" : "Olá,"}
+            </p>
             <p className="max-w-[5rem] truncate text-xs font-semibold text-lime-400 sm:max-w-none sm:text-sm">
-              {user.name ?? "Jogador"}
+              {needsProfile ? "Nome obrigatório" : (user.name ?? "Jogador")}
             </p>
           </div>
           <form action={logout}>

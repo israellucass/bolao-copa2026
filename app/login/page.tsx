@@ -1,12 +1,12 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/LoginForm";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser, userNeedsProfile } from "@/lib/auth";
 
 export default async function LoginPage() {
   const user = await getSessionUser();
   if (user) {
-    redirect(user.name?.trim() ? "/" : "/perfil");
+    redirect(userNeedsProfile(user) ? "/perfil" : "/");
   }
 
   const cookieStore = await cookies();
