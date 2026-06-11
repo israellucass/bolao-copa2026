@@ -10,6 +10,7 @@ import {
 } from "@/lib/actions/admin";
 import { syncBrazilMatches } from "@/lib/actions/sync-matches";
 import { CurrencyInput } from "@/components/CurrencyInput";
+import { MatchTeams } from "@/components/MatchTeams";
 import { formatCurrencyBRL, formatMatchDate, formatTeamName } from "@/lib/format";
 import { theme } from "@/lib/theme";
 import type { Match, User } from "@/lib/types";
@@ -172,13 +173,14 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
                 key={match.id}
                 className="rounded-xl border border-stone-800 bg-stone-950/50 p-3"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-semibold text-amber-100">
-                      {formatTeamName(match.home_team)} vs{" "}
-                      {formatTeamName(match.away_team)}
-                    </p>
-                    <p className="text-xs text-stone-400">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 space-y-1.5">
+                    <MatchTeams
+                      homeTeam={match.home_team}
+                      awayTeam={match.away_team}
+                      size="sm"
+                    />
+                    <p className={theme.meta}>
                       {formatMatchDate(match.match_date)} ·{" "}
                       {formatCurrencyBRL(match.cost_brl)}
                     </p>
@@ -302,13 +304,16 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           </select>
 
           {selectedMatch && (
-            <p className="text-xs text-stone-400">
-              Partida selecionada nos pagamentos:{" "}
-              <strong className="text-amber-100">
-                {formatTeamName(selectedMatch.home_team)} vs{" "}
-                {formatTeamName(selectedMatch.away_team)}
-              </strong>
-            </p>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-stone-300">
+                Partida selecionada nos pagamentos:
+              </p>
+              <MatchTeams
+                homeTeam={selectedMatch.home_team}
+                awayTeam={selectedMatch.away_team}
+                size="sm"
+              />
+            </div>
           )}
 
           <div className="flex items-center justify-center gap-4">

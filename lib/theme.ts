@@ -14,7 +14,7 @@ export const theme = {
   mainWithNav:
     "mx-auto w-full max-w-lg flex-1 px-4 py-4 pb-2 sm:py-5",
   heading: "text-xl font-black text-amber-100 sm:text-2xl",
-  subheading: "text-sm leading-relaxed text-stone-400",
+  subheading: "text-sm leading-relaxed text-stone-300",
   sectionTitle:
     "text-xs font-bold uppercase tracking-wider text-lime-400/90 sm:text-sm",
   sectionTitleMuted:
@@ -23,10 +23,14 @@ export const theme = {
   cardInner:
     "rounded-2xl border border-stone-800 bg-stone-900 p-4 shadow-lg sm:p-5",
   cardHeader:
-    "border-b border-stone-800 bg-neutral-900/90 px-4 py-3.5 sm:px-5",
+    "border-b border-stone-800 bg-neutral-900/90 px-4 py-4 sm:px-5 sm:py-5",
   label:
-    "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-stone-400",
-  labelInline: "mb-1.5 block text-xs font-medium text-stone-400",
+    "mb-2 block text-xs font-bold uppercase tracking-wide text-stone-300 sm:text-sm",
+  labelInline:
+    "mb-2 block text-sm font-semibold text-stone-200 sm:text-base",
+  meta:
+    "text-sm leading-relaxed text-stone-300",
+  bodyText: "text-base leading-relaxed text-stone-200",
   input:
     "w-full min-h-12 rounded-xl border border-stone-700 bg-stone-950 px-4 py-3 text-base text-amber-100 placeholder:text-stone-600 outline-none transition focus:border-lime-500 focus:ring-2 focus:ring-lime-500/40 sm:text-sm",
   select:

@@ -31,7 +31,7 @@ export default async function DashboardPage() {
             className="mx-auto mb-3 sm:mx-0 drop-shadow-[0_6px_20px_rgba(0,0,0,0.4)]"
           />
           <h1 className={theme.heading}>Jogos do Brasil</h1>
-          <p className={theme.subheading}>
+          <p className={`${theme.subheading} max-w-prose`}>
             Palpites na próxima partida, antes do apito inicial. O Pix ao
             vencedor é feito depois do resultado.
           </p>

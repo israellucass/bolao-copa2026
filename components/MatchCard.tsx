@@ -1,13 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
+import { MatchTeams } from "@/components/MatchTeams";
+import { TeamLabel } from "@/components/TeamLabel";
 import { savePrediction, type PredictionState } from "@/lib/actions/predictions";
 import { getBetLockMessage } from "@/lib/betting";
-import {
-  formatAmountBRL,
-  formatMatchDate,
-  formatTeamName,
-} from "@/lib/format";
+import { formatAmountBRL, formatMatchDate } from "@/lib/format";
 import { theme } from "@/lib/theme";
 import type { MatchWithMeta } from "@/lib/types";
 import { MatchWinnerBanner } from "./MatchWinnerBanner";
@@ -31,51 +29,49 @@ export function MatchCard({ match }: MatchCardProps) {
   return (
     <article className={theme.card}>
       <div className={theme.cardHeader}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <h2 className="text-base font-bold leading-snug text-amber-100 sm:text-lg">
-              {formatTeamName(match.home_team)}{" "}
-              <span className="font-normal text-stone-600">vs</span>{" "}
-              {formatTeamName(match.away_team)}
-            </h2>
-            <p className="mt-0.5 text-xs text-stone-400">
-              {formatMatchDate(match.match_date)}
-            </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 space-y-2">
+            <MatchTeams
+              homeTeam={match.home_team}
+              awayTeam={match.away_team}
+              size="lg"
+            />
+            <p className={theme.meta}>{formatMatchDate(match.match_date)}</p>
           </div>
-          <div className="flex flex-row flex-wrap gap-1.5 sm:flex-col sm:items-end">
+          <div className="flex flex-row flex-wrap gap-2 sm:flex-col sm:items-end">
             <StatusBadge status={match.status} />
-            {isFinished && (
-              <StatusBadge status={match.payment_status} />
-            )}
+            {isFinished && <StatusBadge status={match.payment_status} />}
           </div>
         </div>
       </div>
 
-      <div className="space-y-4 px-4 py-4 sm:px-5">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-stone-400">Valor da aposta</span>
-          <span className={`inline-flex items-center gap-1.5 ${theme.accentText}`}>
+      <div className="space-y-5 px-4 py-5 sm:px-5 sm:py-6">
+        <div className="flex items-center justify-between gap-3 text-base">
+          <span className="font-medium text-stone-300">Valor da aposta</span>
+          <span className={`inline-flex items-center gap-2 ${theme.accentText}`}>
             <span
-              className="rounded-md bg-lime-950/60 px-1.5 py-0.5 text-xs font-bold text-lime-400 ring-1 ring-lime-800/50"
+              className="rounded-md bg-lime-950/60 px-2 py-1 text-sm font-bold text-lime-400 ring-1 ring-lime-800/50"
               aria-hidden
             >
               R$
             </span>
-            {formatAmountBRL(match.cost_brl)}
+            <span className="text-lg font-bold">
+              {formatAmountBRL(match.cost_brl)}
+            </span>
           </span>
         </div>
 
         {isFinished && match.home_score != null && match.away_score != null && (
-          <div className="space-y-3">
-            <div className="rounded-xl border border-stone-800 bg-stone-950/60 px-3 py-2 text-center">
-              <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
+          <div className="space-y-4">
+            <div className="rounded-xl border border-stone-800 bg-stone-950/60 px-4 py-4 text-center">
+              <p className="text-sm font-bold uppercase tracking-wide text-stone-400">
                 Resultado final
               </p>
-              <p className="text-2xl font-black text-amber-100">
+              <p className="mt-2 text-3xl font-black tracking-tight text-amber-50 sm:text-4xl">
                 {match.home_score} × {match.away_score}
               </p>
               {match.prediction?.points != null && (
-                <p className="mt-1 text-sm font-semibold text-lime-400">
+                <p className="mt-2 text-base font-semibold text-lime-400">
                   Seus pontos: {match.prediction.points} pts
                 </p>
               )}
@@ -84,18 +80,19 @@ export function MatchCard({ match }: MatchCardProps) {
           </div>
         )}
 
-        <form action={formAction} className="space-y-3">
+        <form action={formAction} className="space-y-4">
           <input type="hidden" name="match_id" value={match.id} />
 
           <div>
             <p className={theme.label}>Seu palpite</p>
-            <div className="flex items-center justify-center gap-4 sm:gap-5">
-              <div className="text-center">
-                <label
-                  htmlFor={`home-${match.id}`}
-                  className={theme.labelInline}
-                >
-                  {formatTeamName(match.home_team)}
+            <div className="flex items-end justify-center gap-4 sm:gap-6">
+              <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
+                <label htmlFor={`home-${match.id}`} className="w-full">
+                  <TeamLabel
+                    name={match.home_team}
+                    size="sm"
+                    className="justify-center font-semibold text-stone-200"
+                  />
                 </label>
                 <input
                   id={`home-${match.id}`}
@@ -108,13 +105,14 @@ export function MatchCard({ match }: MatchCardProps) {
                   className={theme.scoreInput}
                 />
               </div>
-              <span className="pt-5 text-xl font-light text-stone-600">×</span>
-              <div className="text-center">
-                <label
-                  htmlFor={`away-${match.id}`}
-                  className={theme.labelInline}
-                >
-                  {formatTeamName(match.away_team)}
+              <span className="pb-4 text-2xl font-light text-stone-500">×</span>
+              <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
+                <label htmlFor={`away-${match.id}`} className="w-full">
+                  <TeamLabel
+                    name={match.away_team}
+                    size="sm"
+                    className="justify-center font-semibold text-stone-200"
+                  />
                 </label>
                 <input
                   id={`away-${match.id}`}
