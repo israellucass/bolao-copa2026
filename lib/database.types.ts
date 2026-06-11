@@ -94,6 +94,35 @@ export interface Database {
           created_at?: string;
         };
       };
+      prediction_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          match_id: string;
+          home_score: number;
+          away_score: number;
+          action: "created" | "updated";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          match_id: string;
+          home_score: number;
+          away_score: number;
+          action: "created" | "updated";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          match_id?: string;
+          home_score?: number;
+          away_score?: number;
+          action?: "created" | "updated";
+          created_at?: string;
+        };
+      };
       predictions: {
         Row: {
           id: string;

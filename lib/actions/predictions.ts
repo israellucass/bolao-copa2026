@@ -67,6 +67,8 @@ export async function savePrediction(
     updated_at: new Date().toISOString(),
   };
 
+  const action = existing ? "updated" : "created";
+
   const { error } = existing
     ? await supabase
         .from("predictions")
@@ -80,6 +82,18 @@ export async function savePrediction(
 
   if (error) {
     return { error: "Não foi possível salvar o palpite." };
+  }
+
+  const { error: logError } = await supabase.from("prediction_log").insert({
+    user_id: user.id,
+    match_id: matchId,
+    home_score: homeScore,
+    away_score: awayScore,
+    action,
+  });
+
+  if (logError) {
+    return { error: "Palpite salvo, mas o histórico não foi registrado." };
   }
 
   revalidatePath("/");

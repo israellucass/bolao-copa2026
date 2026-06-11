@@ -4,10 +4,11 @@ import { useActionState } from "react";
 import { MatchTeams } from "@/components/MatchTeams";
 import { TeamLabel } from "@/components/TeamLabel";
 import { savePrediction, type PredictionState } from "@/lib/actions/predictions";
-import { getBetLockMessage } from "@/lib/betting";
+import { getBetLockMessage, hasMatchStarted } from "@/lib/betting";
 import { formatAmountBRL, formatMatchDate } from "@/lib/format";
 import { theme } from "@/lib/theme";
 import type { MatchWithMeta } from "@/lib/types";
+import { PredictionTimeline } from "./PredictionTimeline";
 import { MatchSettlementPanel } from "./MatchSettlementPanel";
 import { StatusBadge } from "./StatusBadge";
 
@@ -26,6 +27,8 @@ export function MatchCard({ match, currentUserId }: MatchCardProps) {
 
   const canBet = match.can_bet;
   const isFinished = match.status === "finished";
+  const canStillChange =
+    match.status === "open" && !hasMatchStarted(match.match_date);
 
   return (
     <article className={theme.card}>
@@ -158,6 +161,12 @@ export function MatchCard({ match, currentUserId }: MatchCardProps) {
             </button>
           )}
         </form>
+
+        <PredictionTimeline
+          entries={match.prediction_log}
+          currentUserId={currentUserId}
+          canStillChange={canStillChange}
+        />
       </div>
     </article>
   );

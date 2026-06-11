@@ -53,9 +53,22 @@ create table if not exists public.predictions (
   unique (user_id, match_id)
 );
 
+-- Histórico público de palpites (cada criação/alteração)
+create table if not exists public.prediction_log (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.users(id) on delete cascade,
+  match_id uuid not null references public.matches(id) on delete cascade,
+  home_score int not null check (home_score >= 0),
+  away_score int not null check (away_score >= 0),
+  action text not null check (action in ('created', 'updated')),
+  created_at timestamptz not null default now()
+);
+
 create index if not exists idx_matches_date on public.matches (match_date);
 create index if not exists idx_predictions_user on public.predictions (user_id);
 create index if not exists idx_predictions_match on public.predictions (match_id);
+create index if not exists idx_prediction_log_match_created
+  on public.prediction_log (match_id, created_at desc);
 create index if not exists idx_payments_match on public.payments (match_id);
 
 -- RLS: disabled for simplicity with anon key in a trusted friends group.
@@ -64,11 +77,13 @@ alter table public.users enable row level security;
 alter table public.matches enable row level security;
 alter table public.payments enable row level security;
 alter table public.predictions enable row level security;
+alter table public.prediction_log enable row level security;
 
 create policy "Allow all for anon" on public.users for all using (true) with check (true);
 create policy "Allow all for anon" on public.matches for all using (true) with check (true);
 create policy "Allow all for anon" on public.payments for all using (true) with check (true);
 create policy "Allow all for anon" on public.predictions for all using (true) with check (true);
+create policy "Allow all for anon" on public.prediction_log for all using (true) with check (true);
 
 -- Mark your admin user after first login:
 -- update public.users set is_admin = true where whatsapp = '11999999999';

@@ -30,6 +30,16 @@ export function formatMatchDate(isoDate: string): string {
   }).format(new Date(isoDate));
 }
 
+export function formatLogTimestamp(isoDate: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(isoDate));
+}
+
 /** Máscara brasileira: (98) 99999-9999 — até 11 dígitos */
 export function maskWhatsAppInput(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 11);

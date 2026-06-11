@@ -59,6 +59,19 @@ export interface Prediction {
   points: number | null;
 }
 
+export type PredictionLogAction = "created" | "updated";
+
+export interface PredictionLogEntry {
+  id: string;
+  user_id: string;
+  user_name: string;
+  match_id: string;
+  home_score: number;
+  away_score: number;
+  action: PredictionLogAction;
+  created_at: string;
+}
+
 export type BetLockReason =
   | "match_closed"
   | "match_finished"
@@ -71,6 +84,7 @@ export interface MatchWithMeta extends Match {
   can_bet: boolean;
   lock_reason: BetLockReason | null;
   prize_settlement: MatchPrizeSettlement | null;
+  prediction_log: PredictionLogEntry[];
 }
 
 export interface RankingEntry {
