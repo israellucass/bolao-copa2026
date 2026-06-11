@@ -8,16 +8,17 @@ import { getBetLockMessage } from "@/lib/betting";
 import { formatAmountBRL, formatMatchDate } from "@/lib/format";
 import { theme } from "@/lib/theme";
 import type { MatchWithMeta } from "@/lib/types";
-import { MatchWinnerBanner } from "./MatchWinnerBanner";
+import { MatchSettlementPanel } from "./MatchSettlementPanel";
 import { StatusBadge } from "./StatusBadge";
 
 const initialState: PredictionState = {};
 
 interface MatchCardProps {
   match: MatchWithMeta;
+  currentUserId: string;
 }
 
-export function MatchCard({ match }: MatchCardProps) {
+export function MatchCard({ match, currentUserId }: MatchCardProps) {
   const [state, formAction, pending] = useActionState(
     savePrediction,
     initialState
@@ -76,7 +77,17 @@ export function MatchCard({ match }: MatchCardProps) {
                 </p>
               )}
             </div>
-            <MatchWinnerBanner winners={match.winners} />
+            {match.prize_settlement ? (
+              <MatchSettlementPanel
+                settlement={match.prize_settlement}
+                currentUserId={currentUserId}
+              />
+            ) : (
+              <p className="rounded-xl border border-stone-800 bg-stone-950/50 px-4 py-3 text-center text-sm text-stone-400">
+                Nenhum vencedor nesta rodada — o valor acumula para a próxima
+                partida.
+              </p>
+            )}
           </div>
         )}
 

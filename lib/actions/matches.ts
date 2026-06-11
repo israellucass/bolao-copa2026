@@ -2,7 +2,7 @@
 
 import { enrichMatchesWithBetting } from "../betting";
 import { requireCompleteUser } from "../auth";
-import { getMatchWinnersMap } from "../match-winners";
+import { getMatchPrizeSettlementsMap } from "../match-prizes";
 import { supabase } from "../supabase";
 import type { MatchWithMeta } from "../types";
 
@@ -38,10 +38,8 @@ export async function getMatchesForUser(): Promise<MatchWithMeta[]> {
     (predictions ?? []).map((p) => [p.match_id, p])
   );
 
-  const finishedIds = matches
-    .filter((m) => m.status === "finished")
-    .map((m) => m.id);
-  const winnersMap = await getMatchWinnersMap(finishedIds);
+  const finishedMatches = matches.filter((m) => m.status === "finished");
+  const settlementsMap = await getMatchPrizeSettlementsMap(finishedMatches);
 
   const withMeta = matches.map((match) => ({
     ...match,
@@ -49,7 +47,7 @@ export async function getMatchesForUser(): Promise<MatchWithMeta[]> {
       | "paid"
       | "pending",
     prediction: predictionMap.get(match.id) ?? null,
-    winners: winnersMap.get(match.id) ?? [],
+    prize_settlement: settlementsMap.get(match.id) ?? null,
   }));
 
   return enrichMatchesWithBetting(withMeta);

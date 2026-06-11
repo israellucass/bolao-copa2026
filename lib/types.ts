@@ -14,6 +14,29 @@ export interface MatchWinner {
   name: string;
   pix_key: string | null;
   points: number;
+  prize_amount: number;
+}
+
+export interface MatchLoserDebt {
+  user_id: string;
+  name: string;
+  amount_due: number;
+  payments: {
+    winner_id: string;
+    winner_name: string;
+    amount: number;
+  }[];
+}
+
+export interface MatchPrizeSettlement {
+  match_pot: number;
+  carry_in: number;
+  total_pot: number;
+  participant_count: number;
+  winner_count: number;
+  prize_per_winner: number;
+  winners: MatchWinner[];
+  losers: MatchLoserDebt[];
 }
 
 export interface Match {
@@ -47,7 +70,7 @@ export interface MatchWithMeta extends Match {
   prediction: Prediction | null;
   can_bet: boolean;
   lock_reason: BetLockReason | null;
-  winners: MatchWinner[];
+  prize_settlement: MatchPrizeSettlement | null;
 }
 
 export interface RankingEntry {

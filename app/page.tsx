@@ -55,7 +55,11 @@ export default async function DashboardPage() {
               <section className="space-y-3 sm:space-y-4">
                 <h2 className={theme.sectionTitle}>Próximas partidas</h2>
                 {sortedUpcoming.map((match) => (
-                  <MatchCard key={match.id} match={match} />
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    currentUserId={user.id}
+                  />
                 ))}
               </section>
             )}
@@ -64,7 +68,11 @@ export default async function DashboardPage() {
               <section className="space-y-3 sm:space-y-4">
                 <h2 className={theme.sectionTitleMuted}>Partidas anteriores</h2>
                 {sortedPast.map((match) => (
-                  <MatchCard key={match.id} match={match} />
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    currentUserId={user.id}
+                  />
                 ))}
               </section>
             )}
