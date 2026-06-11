@@ -35,7 +35,7 @@ export function TeamLabel({
   flagClassName,
 }: TeamLabelProps) {
   const styles = sizeStyles[size];
-  const flagUrl = getTeamFlagUrl(name, styles.flag === 20 ? 20 : styles.flag === 24 ? 24 : 32);
+  const flagUrl = getTeamFlagUrl(name, styles.flag);
   const displayName = formatTeamName(name);
 
   return (
@@ -53,6 +53,7 @@ export function TeamLabel({
           alt=""
           width={styles.flag}
           height={Math.round(styles.flag * 0.75)}
+          unoptimized
           className={cn(
             "shrink-0 rounded-sm object-cover shadow-sm ring-1 ring-stone-700/80",
             flagClassName

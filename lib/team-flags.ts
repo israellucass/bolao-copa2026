@@ -71,11 +71,23 @@ export function getTeamFlagCode(teamName: string): string | null {
   return null;
 }
 
+/** Larguras suportadas pelo flagcdn.com */
+export type FlagCdnWidth = 20 | 40 | 80 | 160 | 320;
+
+const FLAGCDN_WIDTHS: FlagCdnWidth[] = [20, 40, 80, 160, 320];
+
+/** Converte tamanho de exibição para largura válida no CDN (evita 404). */
+export function resolveFlagCdnWidth(displayPx: number): FlagCdnWidth {
+  const supported = FLAGCDN_WIDTHS.filter((w) => w >= displayPx);
+  return supported[0] ?? 320;
+}
+
 export function getTeamFlagUrl(
   teamName: string,
-  width: 20 | 24 | 32 | 40 = 40
+  displayPx = 24
 ): string | null {
   const code = getTeamFlagCode(teamName);
   if (!code) return null;
+  const width = resolveFlagCdnWidth(displayPx);
   return `https://flagcdn.com/w${width}/${code}.png`;
 }
