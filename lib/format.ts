@@ -30,15 +30,26 @@ export function formatMatchDate(isoDate: string): string {
   }).format(new Date(isoDate));
 }
 
+/** Máscara brasileira: (98) 99999-9999 — até 11 dígitos */
+export function maskWhatsAppInput(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length === 0) return "";
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 7) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  }
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
 export function formatWhatsApp(value: string): string {
   const digits = value.replace(/\D/g, "");
-  if (digits.length === 11) {
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  if (digits.length <= 11) {
+    return maskWhatsAppInput(digits);
   }
   if (digits.length === 13) {
     return `+${digits.slice(0, 2)} (${digits.slice(2, 4)}) ${digits.slice(4, 9)}-${digits.slice(9)}`;
   }
-  return value;
+  return maskWhatsAppInput(digits);
 }
 
 export function normalizeWhatsApp(value: string): string {

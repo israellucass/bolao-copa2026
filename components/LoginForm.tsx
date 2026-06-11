@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { GrileirosMascot } from "@/components/GrileirosMascot";
 import { loginWithWhatsApp, type AuthState } from "@/lib/actions/auth";
-import { formatWhatsApp } from "@/lib/format";
+import { WhatsAppInput } from "@/components/WhatsAppInput";
 import { APP_SUBTITLE, APP_TITLE, theme } from "@/lib/theme";
 
 const initialState: AuthState = {};
@@ -17,10 +17,6 @@ export function LoginForm({ defaultWhatsApp = "" }: LoginFormProps) {
     loginWithWhatsApp,
     initialState
   );
-
-  const displayDefault = defaultWhatsApp
-    ? formatWhatsApp(defaultWhatsApp)
-    : "";
 
   return (
     <main className="flex min-h-dvh flex-col bg-gradient-to-b from-stone-950 via-emerald-950 to-stone-900 safe-x safe-bottom safe-top">
@@ -45,17 +41,11 @@ export function LoginForm({ defaultWhatsApp = "" }: LoginFormProps) {
               <label htmlFor="whatsapp" className={theme.label}>
                 Seu WhatsApp
               </label>
-              <input
-                id="whatsapp"
-                name="whatsapp"
-                type="tel"
-                required
-                autoComplete="tel"
-                defaultValue={displayDefault}
-                placeholder="(98) 99999-9999"
-                className={theme.input}
-              />
-              <p className="mt-2 text-xs leading-relaxed text-stone-500">
+              <WhatsAppInput defaultValue={defaultWhatsApp} />
+              <p
+                id="whatsapp-hint"
+                className="mt-2 text-xs leading-relaxed text-stone-500"
+              >
                 Seu número de identificação no bolão. Depois você escolhe seu
                 nome.
               </p>
