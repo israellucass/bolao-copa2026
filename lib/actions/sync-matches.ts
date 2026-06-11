@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { DEFAULT_BET_BRL } from "../constants";
 import { requireAdmin } from "../auth";
 import { fetchBrazilWorldCupFixtures } from "../football-api";
 import {
@@ -17,7 +18,9 @@ export async function syncBrazilMatches(
 ): Promise<AdminState> {
   await requireAdmin();
 
-  const costBrl = parseFloat((formData.get("cost_brl") as string) || "5");
+  const costBrl = parseFloat(
+    (formData.get("cost_brl") as string) || String(DEFAULT_BET_BRL)
+  );
 
   if (Number.isNaN(costBrl) || costBrl <= 0) {
     return { error: "Valor da aposta inválido." };

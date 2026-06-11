@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { AdminPanel } from "@/components/AdminPanel";
-import { Navbar } from "@/components/Navbar";
+import { AppShell } from "@/components/AppShell";
 import { getAdminData } from "@/lib/actions/admin";
 import { requireCompleteUser } from "@/lib/auth";
+import { theme } from "@/lib/theme";
 
 export default async function AdminPage() {
   const user = await requireCompleteUser();
@@ -11,17 +12,16 @@ export default async function AdminPage() {
   const { matches, users, payments } = await getAdminData();
 
   return (
-    <>
-      <Navbar user={user} />
-      <main className="mx-auto w-full max-w-lg flex-1 px-4 py-5">
+    <AppShell user={user}>
+      <main className={theme.mainWithNav}>
         <section className="mb-5">
-          <h1 className="text-xl font-black text-emerald-950">Painel Admin</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className={theme.heading}>Painel Admin</h1>
+          <p className={theme.subheading}>
             Gerencie partidas, pagamentos e resultados.
           </p>
         </section>
         <AdminPanel matches={matches} users={users} payments={payments} />
       </main>
-    </>
+    </AppShell>
   );
 }

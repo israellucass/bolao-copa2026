@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { logout } from "@/lib/actions/auth";
+import { GrileirosMascot } from "@/components/GrileirosMascot";
+import { APP_SUBTITLE, APP_TITLE, APP_TITLE_SHORT } from "@/lib/theme";
 import type { User } from "@/lib/types";
 
 interface NavbarProps {
@@ -8,58 +9,29 @@ interface NavbarProps {
 
 export function Navbar({ user }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-50 border-b border-emerald-900/20 bg-gradient-to-r from-emerald-950 via-green-900 to-yellow-700 text-white shadow-lg">
-      <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl" aria-hidden>
-            ⚽
-          </span>
-          <div>
-            <p className="text-sm font-bold leading-tight tracking-wide">
-              Bolão Copa 2026
+    <header
+      className="sticky top-0 z-40 border-b border-stone-800 bg-stone-950/95 shadow-lg shadow-black/20 backdrop-blur-md safe-top safe-x"
+    >
+      <div className="mx-auto flex max-w-lg items-center gap-3 py-3">
+        <Link href="/" className="flex min-w-0 flex-1 items-center gap-2.5">
+          <GrileirosMascot variant="nav" priority className="shrink-0" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold leading-tight tracking-wide text-amber-100 sm:text-base">
+              <span className="sm:hidden">{APP_TITLE_SHORT}</span>
+              <span className="hidden sm:inline">{APP_TITLE}</span>
             </p>
-            <p className="text-[10px] font-medium text-yellow-200/90">
-              Seleção Brasileira
+            <p className="truncate text-[10px] font-medium text-stone-400 sm:text-xs">
+              {APP_SUBTITLE}
             </p>
           </div>
         </Link>
 
-        <nav className="flex items-center gap-1 text-sm">
-          <Link
-            href="/perfil"
-            className="rounded-lg px-2.5 py-1.5 font-medium text-yellow-100 transition hover:bg-white/10"
-          >
-            Perfil
-          </Link>
-          <Link
-            href="/ranking"
-            className="rounded-lg px-2.5 py-1.5 font-medium text-yellow-100 transition hover:bg-white/10"
-          >
-            Ranking
-          </Link>
-          {user.is_admin && (
-            <Link
-              href="/admin"
-              className="rounded-lg px-2.5 py-1.5 font-medium text-yellow-100 transition hover:bg-white/10"
-            >
-              Admin
-            </Link>
-          )}
-          <form action={logout}>
-            <button
-              type="submit"
-              className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
-            >
-              Sair
-            </button>
-          </form>
-        </nav>
-      </div>
-      <div className="border-t border-white/10 bg-black/20 px-4 py-1.5 text-center text-xs text-yellow-100/90">
-        Olá,{" "}
-        <span className="font-semibold text-white">
-          {user.name ?? "Jogador"}
-        </span>
+        <div className="shrink-0 rounded-full bg-stone-900 px-3 py-1.5 text-right ring-1 ring-stone-800">
+          <p className="text-[10px] text-stone-500">Olá,</p>
+          <p className="max-w-[6.5rem] truncate text-xs font-semibold text-lime-400 sm:max-w-none sm:text-sm">
+            {user.name ?? "Jogador"}
+          </p>
+        </div>
       </div>
     </header>
   );

@@ -9,7 +9,9 @@ import {
   type AdminState,
 } from "@/lib/actions/admin";
 import { syncBrazilMatches } from "@/lib/actions/sync-matches";
+import { CurrencyInput } from "@/components/CurrencyInput";
 import { formatCurrencyBRL, formatMatchDate, formatTeamName } from "@/lib/format";
+import { theme } from "@/lib/theme";
 import type { Match, User } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
 
@@ -64,39 +66,31 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
   return (
     <div className="space-y-6">
       {/* API Sync */}
-      <section className="rounded-2xl border border-blue-200 bg-gradient-to-b from-blue-50 to-white p-4 shadow-sm">
-        <h2 className="mb-1 text-base font-bold text-emerald-950">
+      <section className={theme.cardInner}>
+        <h2 className="mb-1 text-base font-bold text-amber-100">
           Importar jogos do Brasil
         </h2>
-        <p className="mb-3 text-xs text-gray-500">
-          Busca automaticamente os jogos da Seleção Brasileira na Copa do Mundo
-          2026 via football-data.org e cadastra no bolão.
+        <p className={`mb-3 ${theme.subheading}`}>
+          Busca automaticamente os jogos da Seleção na Copa 2026 via
+          football-data.org.
         </p>
         <form action={syncAction} className="space-y-3">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600">
-              Valor da aposta (R$)
-            </label>
-            <input
-              name="cost_brl"
-              type="number"
-              step="0.01"
-              min="1"
-              defaultValue="5.00"
-              required
-              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-            />
-          </div>
+          <CurrencyInput
+            id="sync-cost-brl"
+            name="cost_brl"
+            label="Valor da aposta"
+            required
+          />
           {syncState.error && (
-            <p className="text-xs text-red-600">{syncState.error}</p>
+            <p className="text-xs text-red-300">{syncState.error}</p>
           )}
           {syncState.success && (
-            <p className="text-xs text-emerald-600">{syncState.success}</p>
+            <p className="text-xs text-lime-400">{syncState.success}</p>
           )}
           <button
             type="submit"
             disabled={syncPending}
-            className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-bold text-white disabled:opacity-60"
+            className={`${theme.btnPrimary} w-full`}
           >
             {syncPending
               ? "Buscando jogos..."
@@ -106,72 +100,58 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
       </section>
 
       {/* Create Match */}
-      <section className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-base font-bold text-emerald-950">
+      <section className={theme.cardInner}>
+        <h2 className="mb-3 text-base font-bold text-amber-100">
           Nova partida (manual)
         </h2>
         <form action={createAction} className="space-y-3">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">
-                Mandante
-              </label>
+              <label className={theme.labelInline}>Mandante</label>
               <input
                 name="home_team"
                 defaultValue="Brasil"
                 required
-                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                className={theme.input}
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">
-                Visitante
-              </label>
+              <label className={theme.labelInline}>Visitante</label>
               <input
                 name="away_team"
                 placeholder="Adversário"
                 required
-                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                className={theme.input}
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">
-                Data e hora
-              </label>
+              <label className={theme.labelInline}>Data e hora</label>
               <input
                 name="match_date"
                 type="datetime-local"
                 required
-                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                className={theme.input}
               />
             </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">
-                Valor (R$)
-              </label>
-              <input
-                name="cost_brl"
-                type="number"
-                step="0.01"
-                min="1"
-                defaultValue="5.00"
-                required
-                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
+            <CurrencyInput
+              id="create-cost-brl"
+              name="cost_brl"
+              label="Valor da aposta"
+              required
+            />
           </div>
           {createState.error && (
-            <p className="text-xs text-red-600">{createState.error}</p>
+            <p className="text-xs text-red-300">{createState.error}</p>
           )}
           {createState.success && (
-            <p className="text-xs text-emerald-600">{createState.success}</p>
+            <p className="text-xs text-lime-400">{createState.success}</p>
           )}
           <button
             type="submit"
             disabled={createPending}
-            className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white disabled:opacity-60"
+            className={`${theme.btnPrimary} w-full`}
           >
             {createPending ? "Criando..." : "Adicionar partida"}
           </button>
@@ -179,26 +159,26 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
       </section>
 
       {/* Match list & status */}
-      <section className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-base font-bold text-emerald-950">
+      <section className={theme.cardInner}>
+        <h2 className="mb-3 text-base font-bold text-amber-100">
           Gerenciar partidas
         </h2>
         {matches.length === 0 ? (
-          <p className="text-sm text-gray-500">Nenhuma partida cadastrada.</p>
+          <p className={theme.subheading}>Nenhuma partida cadastrada.</p>
         ) : (
           <div className="space-y-3">
             {matches.map((match) => (
               <div
                 key={match.id}
-                className="rounded-xl border border-gray-100 bg-gray-50 p-3"
+                className="rounded-xl border border-stone-800 bg-stone-950/50 p-3"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-amber-100">
                       {formatTeamName(match.home_team)} vs{" "}
                       {formatTeamName(match.away_team)}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-stone-400">
                       {formatMatchDate(match.match_date)} ·{" "}
                       {formatCurrencyBRL(match.cost_brl)}
                     </p>
@@ -212,10 +192,10 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
                       type="button"
                       disabled={statusPending || match.status === status}
                       onClick={() => handleStatusChange(match.id, status)}
-                      className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
+                      className={`${theme.btnChip} ${
                         match.status === status
-                          ? "bg-emerald-600 text-white"
-                          : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-emerald-50"
+                          ? "bg-lime-400 text-stone-950"
+                          : "bg-stone-900 text-stone-400 ring-1 ring-stone-700 hover:bg-stone-800 hover:text-amber-100"
                       } disabled:opacity-50`}
                     >
                       {status === "open"
@@ -233,11 +213,11 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
       </section>
 
       {/* Payment tracker */}
-      <section className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
-        <h2 className="mb-1 text-base font-bold text-emerald-950">
+      <section className={theme.cardInner}>
+        <h2 className="mb-1 text-base font-bold text-amber-100">
           Controle de pagamentos
         </h2>
-        <p className="mb-3 text-xs text-gray-500">
+        <p className={`mb-3 ${theme.subheading}`}>
           Marque como pago para liberar os palpites de cada jogador.
         </p>
 
@@ -245,7 +225,7 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           <select
             value={selectedMatchId}
             onChange={(e) => setSelectedMatchId(e.target.value)}
-            className="mb-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+            className={`mb-3 ${theme.select}`}
           >
             {matches.map((m) => (
               <option key={m.id} value={m.id}>
@@ -255,21 +235,21 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           </select>
         )}
 
-        <div className="divide-y divide-gray-100 rounded-xl border border-gray-100">
+        <div className="divide-y divide-stone-800 rounded-xl border border-stone-800">
           {users.map((user) => {
             const paid =
               paymentMap.get(paymentKey(user.id, selectedMatchId)) ?? false;
             return (
               <div
                 key={user.id}
-                className="flex items-center justify-between px-3 py-2.5"
+                className="flex min-h-14 items-center justify-between gap-3 px-3 py-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {user.name}
+                  <p className="text-sm font-medium text-amber-100">
+                    {user.name ?? "Sem nome"}
                   </p>
                   {user.whatsapp && (
-                    <p className="text-xs text-gray-400">{user.whatsapp}</p>
+                    <p className="text-xs text-stone-500">{user.whatsapp}</p>
                   )}
                 </div>
                 <button
@@ -278,14 +258,14 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
                   onClick={() =>
                     handlePaymentToggle(user.id, selectedMatchId, !paid)
                   }
-                  className={`relative h-7 w-14 rounded-full transition ${
-                    paid ? "bg-emerald-500" : "bg-gray-300"
+                  className={`relative h-8 w-[3.25rem] shrink-0 rounded-full transition ${
+                    paid ? "bg-emerald-600" : "bg-amber-900"
                   } disabled:opacity-50`}
                   aria-label={`Pagamento de ${user.name}: ${paid ? "pago" : "pendente"}`}
                 >
                   <span
-                    className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition ${
-                      paid ? "left-7" : "left-0.5"
+                    className={`absolute top-1 h-6 w-6 rounded-full bg-stone-200 shadow transition ${
+                      paid ? "left-[1.35rem]" : "left-1"
                     }`}
                   />
                 </button>
@@ -293,28 +273,24 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
             );
           })}
         </div>
-        <div className="mt-2 flex justify-between text-[10px] font-medium uppercase text-gray-400">
+        <div className="mt-2 flex justify-between text-[10px] font-medium uppercase text-stone-500">
           <span>Pendente</span>
           <span>Pago</span>
         </div>
       </section>
 
       {/* Result entry */}
-      <section className="rounded-2xl border border-yellow-200 bg-gradient-to-b from-yellow-50 to-white p-4 shadow-sm">
-        <h2 className="mb-1 text-base font-bold text-emerald-950">
+      <section className="rounded-2xl border border-stone-700 bg-gradient-to-b from-stone-900 to-stone-950 p-4 shadow-lg ring-1 ring-lime-500/10">
+        <h2 className="mb-1 text-base font-bold text-amber-100">
           Lançar resultado
         </h2>
-        <p className="mb-3 text-xs text-gray-500">
+        <p className={`mb-3 ${theme.subheading}`}>
           Ao salvar o placar final, a pontuação de todos os palpites é
           calculada automaticamente.
         </p>
 
         <form action={finishAction} className="space-y-3">
-          <select
-            name="match_id"
-            required
-            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
-          >
+          <select name="match_id" required className={theme.select}>
             <option value="">Selecione a partida</option>
             {matches
               .filter((m) => m.status !== "finished")
@@ -326,9 +302,9 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           </select>
 
           {selectedMatch && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-stone-400">
               Partida selecionada nos pagamentos:{" "}
-              <strong>
+              <strong className="text-amber-100">
                 {formatTeamName(selectedMatch.home_team)} vs{" "}
                 {formatTeamName(selectedMatch.away_team)}
               </strong>
@@ -337,9 +313,7 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
 
           <div className="flex items-center justify-center gap-4">
             <div className="text-center">
-              <label className="mb-1 block text-xs text-gray-600">
-                Mandante
-              </label>
+              <label className={theme.labelInline}>Mandante</label>
               <input
                 name="home_score"
                 type="number"
@@ -347,14 +321,12 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
                 max={20}
                 required
                 defaultValue={0}
-                className="w-16 rounded-xl border border-gray-200 px-2 py-2 text-center text-lg font-bold"
+                className={theme.scoreInput}
               />
             </div>
-            <span className="pt-5 text-gray-300">×</span>
+            <span className="pt-5 text-stone-600">×</span>
             <div className="text-center">
-              <label className="mb-1 block text-xs text-gray-600">
-                Visitante
-              </label>
+              <label className={theme.labelInline}>Visitante</label>
               <input
                 name="away_score"
                 type="number"
@@ -362,22 +334,22 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
                 max={20}
                 required
                 defaultValue={0}
-                className="w-16 rounded-xl border border-gray-200 px-2 py-2 text-center text-lg font-bold"
+                className={theme.scoreInput}
               />
             </div>
           </div>
 
           {finishState.error && (
-            <p className="text-xs text-red-600">{finishState.error}</p>
+            <p className="text-xs text-red-300">{finishState.error}</p>
           )}
           {finishState.success && (
-            <p className="text-xs text-emerald-600">{finishState.success}</p>
+            <p className="text-xs text-lime-400">{finishState.success}</p>
           )}
 
           <button
             type="submit"
             disabled={finishPending}
-            className="w-full rounded-xl bg-gradient-to-r from-yellow-500 to-amber-500 py-2.5 text-sm font-bold text-emerald-950 disabled:opacity-60"
+            className={`${theme.btnPrimary} w-full`}
           >
             {finishPending ? "Calculando..." : "Finalizar e calcular pontos"}
           </button>

@@ -8,21 +8,24 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Bolão Copa 2026 — Seleção Brasileira",
+  title: "Bolão Grileiros 2026",
   description:
-    "Palpites dos jogos do Brasil na Copa do Mundo 2026. Bolão entre amigos.",
+    "Palpites da Seleção Brasileira na Copa 2026 — Grupo Grileiros.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Bolão 2026",
+    title: "Grileiros 2026",
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#064e3b",
+  viewportFit: "cover",
+  themeColor: "#0c0a09",
 };
 
 export default function RootLayout({
@@ -32,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${geist.variable} h-full`}>
-      <body className="min-h-full bg-gray-50 font-sans text-gray-900 antialiased">
+      <body className="min-h-dvh bg-stone-950 font-sans text-base text-amber-100 antialiased">
         {children}
       </body>
     </html>

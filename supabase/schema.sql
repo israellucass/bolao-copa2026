@@ -21,7 +21,7 @@ create table if not exists public.matches (
   home_team text not null,
   away_team text not null,
   match_date timestamptz not null,
-  cost_brl numeric(10, 2) not null default 5.00,
+  cost_brl numeric(10, 2) not null default 4.00,
   status text not null default 'open' check (status in ('open', 'closed', 'finished')),
   home_score int,
   away_score int,

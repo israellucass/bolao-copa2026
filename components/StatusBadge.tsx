@@ -1,9 +1,9 @@
 const variants = {
-  open: "bg-emerald-100 text-emerald-800 ring-emerald-200",
-  closed: "bg-amber-100 text-amber-800 ring-amber-200",
-  finished: "bg-slate-200 text-slate-700 ring-slate-300",
-  paid: "bg-green-100 text-green-800 ring-green-200",
-  pending: "bg-orange-100 text-orange-800 ring-orange-200",
+  open: "bg-lime-950/60 text-lime-400 ring-lime-800",
+  closed: "bg-stone-800 text-stone-300 ring-stone-700",
+  finished: "bg-neutral-800 text-stone-400 ring-stone-700",
+  paid: "bg-emerald-950 text-emerald-300 ring-emerald-800",
+  pending: "bg-amber-950 text-amber-300 ring-amber-900",
 } as const;
 
 const labels = {

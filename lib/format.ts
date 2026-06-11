@@ -11,6 +11,14 @@ export function formatCurrencyBRL(value: number): string {
   }).format(value);
 }
 
+/** Valor numérico sem o símbolo R$ (ex: "4,00") */
+export function formatAmountBRL(value: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 export function formatMatchDate(isoDate: string): string {
   return new Intl.DateTimeFormat("pt-BR", {
     weekday: "short",

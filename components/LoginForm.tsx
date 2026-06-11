@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState } from "react";
+import { GrileirosMascot } from "@/components/GrileirosMascot";
 import { loginWithWhatsApp, type AuthState } from "@/lib/actions/auth";
 import { formatWhatsApp } from "@/lib/format";
+import { APP_SUBTITLE, APP_TITLE, theme } from "@/lib/theme";
 
 const initialState: AuthState = {};
 
@@ -21,27 +23,26 @@ export function LoginForm({ defaultWhatsApp = "" }: LoginFormProps) {
     : "";
 
   return (
-    <main className="flex min-h-full flex-col bg-gradient-to-b from-emerald-950 via-green-900 to-emerald-800">
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-10">
-        <div className="mb-8 text-center text-white">
-          <div className="mb-3 text-5xl" aria-hidden>
-            🇧🇷⚽
-          </div>
-          <h1 className="text-2xl font-black tracking-tight">
-            Bolão Copa 2026
+    <main className="flex min-h-dvh flex-col bg-gradient-to-b from-stone-950 via-emerald-950 to-stone-900 safe-x safe-bottom safe-top">
+      <div className="flex flex-1 flex-col items-center justify-center px-2 py-8 sm:px-4 sm:py-10">
+        <header className="mb-6 w-full max-w-sm text-center">
+          <GrileirosMascot
+            variant="hero"
+            priority
+            className="mx-auto mb-4 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+          />
+          <h1 className="text-2xl font-black tracking-tight text-amber-100 sm:text-3xl">
+            {APP_TITLE}
           </h1>
-          <p className="mt-1 text-sm text-yellow-200/90">
-            Palpites da Seleção · Grupo WhatsApp
+          <p className="mt-2 text-sm leading-relaxed text-stone-400">
+            {APP_SUBTITLE}
           </p>
-        </div>
+        </header>
 
-        <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-black/5">
-          <form action={formAction} className="space-y-4">
+        <div className={`w-full max-w-sm p-4 sm:p-5 ${theme.cardInner}`}>
+          <form action={formAction} className="space-y-5">
             <div>
-              <label
-                htmlFor="whatsapp"
-                className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500"
-              >
+              <label htmlFor="whatsapp" className={theme.label}>
                 Seu WhatsApp
               </label>
               <input
@@ -52,9 +53,9 @@ export function LoginForm({ defaultWhatsApp = "" }: LoginFormProps) {
                 autoComplete="tel"
                 defaultValue={displayDefault}
                 placeholder="(98) 99999-9999"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                className={theme.input}
               />
-              <p className="mt-1 text-[11px] text-gray-400">
+              <p className="mt-2 text-xs leading-relaxed text-stone-500">
                 Seu número de identificação no bolão. Depois você escolhe seu
                 nome.
               </p>
@@ -62,16 +63,14 @@ export function LoginForm({ defaultWhatsApp = "" }: LoginFormProps) {
             <button
               type="submit"
               disabled={pending}
-              className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 py-3 text-sm font-bold text-white shadow-md transition hover:from-emerald-700 hover:to-green-700 disabled:opacity-60"
+              className={theme.btnPrimaryFull}
             >
               {pending ? "Entrando..." : "Entrar"}
             </button>
           </form>
 
           {state.error && (
-            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-center text-xs text-red-700">
-              {state.error}
-            </p>
+            <p className={`mt-4 ${theme.alertError}`}>{state.error}</p>
           )}
         </div>
       </div>
