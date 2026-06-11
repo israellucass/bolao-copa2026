@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import { APP_SUBTITLE, APP_TITLE } from "@/lib/theme";
 import "./globals.css";
 
 const geist = Geist({
@@ -7,10 +8,30 @@ const geist = Geist({
   subsets: ["latin"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  title: "Bolão Grileiros 2026",
-  description:
-    "Palpites da Seleção Brasileira na Copa 2026 — Grupo Grileiros.",
+  metadataBase: new URL(siteUrl),
+  title: APP_TITLE,
+  description: `Palpites da Seleção Brasileira na Copa 2026 — ${APP_SUBTITLE}.`,
+  openGraph: {
+    title: APP_TITLE,
+    description: `Palpites da Seleção Brasileira na Copa 2026 — ${APP_SUBTITLE}.`,
+    siteName: APP_TITLE,
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: APP_TITLE,
+    description: `Palpites da Seleção Brasileira na Copa 2026 — ${APP_SUBTITLE}.`,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

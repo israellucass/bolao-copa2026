@@ -1,0 +1,30 @@
+---
+description: Commit and push to GitHub after every code change (Vercel deploy)
+alwaysApply: true
+---
+
+# Auto commit & push
+
+After completing any implementation, fix, or refactor in this repo:
+
+1. Run `git status` and `git diff` to review changes.
+2. If there are meaningful changes, **commit and push to `origin/main` without asking**.
+3. Use a concise commit message (1–2 sentences, focus on why).
+4. Push with `git push origin main` so Vercel redeploys.
+
+## Skip auto push when
+
+- The user only asked a question (no code changes).
+- There are no changes to commit.
+- Files contain secrets (`.env`, credentials) — never commit those; warn the user.
+- The user explicitly says not to commit or push in that message.
+
+## Git safety
+
+- Never force-push `main`.
+- Never skip hooks unless the user asks.
+- Never amend unless the user asks and the commit was not pushed.
+
+## After push
+
+Briefly confirm: commit hash, short summary, and that Vercel should redeploy.
