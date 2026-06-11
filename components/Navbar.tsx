@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { GrileirosMascot } from "@/components/GrileirosMascot";
-import { APP_SUBTITLE, APP_TITLE, APP_TITLE_SHORT } from "@/lib/theme";
+import { logout } from "@/lib/actions/auth";
+import { APP_SUBTITLE, APP_TITLE, APP_TITLE_SHORT, theme } from "@/lib/theme";
 import type { User } from "@/lib/types";
 
 interface NavbarProps {
@@ -26,11 +27,22 @@ export function Navbar({ user }: NavbarProps) {
           </div>
         </Link>
 
-        <div className="shrink-0 rounded-full bg-stone-900 px-3 py-1.5 text-right ring-1 ring-stone-800">
-          <p className="text-[10px] text-stone-500">Olá,</p>
-          <p className="max-w-[6.5rem] truncate text-xs font-semibold text-lime-400 sm:max-w-none sm:text-sm">
-            {user.name ?? "Jogador"}
-          </p>
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="rounded-full bg-stone-900 px-3 py-1.5 text-right ring-1 ring-stone-800">
+            <p className="text-[10px] text-stone-500">Olá,</p>
+            <p className="max-w-[5rem] truncate text-xs font-semibold text-lime-400 sm:max-w-none sm:text-sm">
+              {user.name ?? "Jogador"}
+            </p>
+          </div>
+          <form action={logout}>
+            <button
+              type="submit"
+              className={`${theme.btnGhost} min-h-9 px-2.5 text-xs text-stone-400 hover:text-amber-100`}
+              aria-label="Sair da conta"
+            >
+              Sair
+            </button>
+          </form>
         </div>
       </div>
     </header>
