@@ -7,6 +7,7 @@ import {
   getNextBettableMatchId,
 } from "../betting";
 import { requireCompleteUser } from "../auth";
+import { appendPredictionLog } from "../prediction-log";
 import { supabase } from "../supabase";
 
 export type PredictionState = {
@@ -84,17 +85,13 @@ export async function savePrediction(
     return { error: "Não foi possível salvar o palpite." };
   }
 
-  const { error: logError } = await supabase.from("prediction_log").insert({
-    user_id: user.id,
-    match_id: matchId,
-    home_score: homeScore,
-    away_score: awayScore,
-    action,
-  });
-
-  if (logError) {
-    return { error: "Palpite salvo, mas o histórico não foi registrado." };
-  }
+  await appendPredictionLog(
+    user.id,
+    matchId,
+    homeScore,
+    awayScore,
+    action
+  );
 
   revalidatePath("/");
   return { success: "Palpite salvo com sucesso!" };

@@ -1,5 +1,23 @@
 import { supabase } from "./supabase";
-import type { PredictionLogEntry } from "./types";
+import type { PredictionLogAction, PredictionLogEntry } from "./types";
+
+export async function appendPredictionLog(
+  userId: string,
+  matchId: string,
+  homeScore: number,
+  awayScore: number,
+  action: PredictionLogAction
+): Promise<boolean> {
+  const { error } = await supabase.from("prediction_log").insert({
+    user_id: userId,
+    match_id: matchId,
+    home_score: homeScore,
+    away_score: awayScore,
+    action,
+  });
+
+  return !error;
+}
 
 type LogRow = {
   id: string;
@@ -26,13 +44,15 @@ export async function getPredictionLogsMap(
   const result = new Map<string, PredictionLogEntry[]>();
   if (matchIds.length === 0) return result;
 
-  const { data: rows } = await supabase
+  const { data: rows, error } = await supabase
     .from("prediction_log")
     .select(
       "id, user_id, match_id, home_score, away_score, action, created_at, users(name)"
     )
     .in("match_id", matchIds)
     .order("created_at", { ascending: false });
+
+  if (error) return result;
 
   for (const row of (rows ?? []) as LogRow[]) {
     const entry: PredictionLogEntry = {
