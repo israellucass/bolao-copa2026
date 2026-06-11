@@ -7,7 +7,11 @@ import {
   setSession,
   userNeedsProfile,
 } from "../auth";
-import { normalizeWhatsApp } from "../format";
+import {
+  isValidBrazilianMobileWhatsApp,
+  normalizeWhatsApp,
+  whatsAppLookupVariants,
+} from "../format";
 import { supabase } from "../supabase";
 
 export type AuthState = {
@@ -22,17 +26,29 @@ export async function loginWithWhatsApp(
     (formData.get("whatsapp") as string) ?? ""
   );
 
-  if (whatsapp.length < 10) {
-    return { error: "Informe um número de WhatsApp válido." };
+  if (!isValidBrazilianMobileWhatsApp(whatsapp)) {
+    return {
+      error: "Informe um WhatsApp válido com DDD (ex: (98) 99999-9999).",
+    };
   }
 
-  const { data: existing } = await supabase
+  const variants = whatsAppLookupVariants(whatsapp);
+  const { data: matches } = await supabase
     .from("users")
-    .select("id, name")
-    .eq("whatsapp", whatsapp)
-    .maybeSingle();
+    .select("id, name, whatsapp")
+    .in("whatsapp", variants)
+    .order("created_at", { ascending: true });
+
+  const existing = matches?.[0];
 
   if (existing) {
+    if (existing.whatsapp !== whatsapp) {
+      await supabase
+        .from("users")
+        .update({ whatsapp })
+        .eq("id", existing.id);
+    }
+
     await setSession(existing.id);
     await setRememberedWhatsApp(whatsapp);
     if (userNeedsProfile(existing)) {
@@ -46,6 +62,25 @@ export async function loginWithWhatsApp(
     .insert({ whatsapp })
     .select("id")
     .single();
+
+  if (error?.code === "23505") {
+    const { data: raced } = await supabase
+      .from("users")
+      .select("id, name")
+      .in("whatsapp", variants)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (raced) {
+      await setSession(raced.id);
+      await setRememberedWhatsApp(whatsapp);
+      if (userNeedsProfile(raced)) {
+        redirect("/perfil");
+      }
+      redirect("/");
+    }
+  }
 
   if (error || !created) {
     return { error: "Não foi possível entrar. Tente novamente." };

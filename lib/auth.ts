@@ -12,7 +12,7 @@ export async function getSessionUser(): Promise<User | null> {
 
   const { data, error } = await supabase
     .from("users")
-    .select("id, name, whatsapp, email, is_admin")
+    .select("id, name, whatsapp, pix_key, email, is_admin")
     .eq("id", userId)
     .single();
 

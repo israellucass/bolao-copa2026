@@ -218,7 +218,7 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           Controle de pagamentos
         </h2>
         <p className={`mb-3 ${theme.subheading}`}>
-          Marque como pago para liberar os palpites de cada jogador.
+          Marque quando cada jogador enviar o Pix ao vencedor da partida.
         </p>
 
         {matches.length > 0 && (
@@ -274,8 +274,8 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           })}
         </div>
         <div className="mt-2 flex justify-between text-[10px] font-medium uppercase text-stone-500">
-          <span>Pendente</span>
-          <span>Pago</span>
+          <span>Pix pendente</span>
+          <span>Pix enviado</span>
         </div>
       </section>
 

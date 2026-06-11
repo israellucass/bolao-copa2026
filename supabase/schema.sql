@@ -8,6 +8,7 @@ create table if not exists public.users (
   id uuid primary key default gen_random_uuid(),
   name text,
   whatsapp text unique,
+  pix_key text,
   email text unique,
   password_hash text,
   is_admin boolean not null default false,
@@ -70,4 +71,4 @@ create policy "Allow all for anon" on public.payments for all using (true) with 
 create policy "Allow all for anon" on public.predictions for all using (true) with check (true);
 
 -- Mark your admin user after first login:
--- update public.users set is_admin = true where whatsapp = '5511999999999';
+-- update public.users set is_admin = true where whatsapp = '11999999999';

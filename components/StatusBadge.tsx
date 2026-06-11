@@ -10,8 +10,8 @@ const labels = {
   open: "Aberta",
   closed: "Fechada",
   finished: "Finalizada",
-  paid: "Pago",
-  pending: "Pendente",
+  paid: "Pix enviado",
+  pending: "Pix pendente",
 } as const;
 
 type Variant = keyof typeof variants;

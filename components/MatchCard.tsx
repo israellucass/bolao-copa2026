@@ -10,6 +10,7 @@ import {
 } from "@/lib/format";
 import { theme } from "@/lib/theme";
 import type { MatchWithMeta } from "@/lib/types";
+import { MatchWinnerBanner } from "./MatchWinnerBanner";
 import { StatusBadge } from "./StatusBadge";
 
 const initialState: PredictionState = {};
@@ -43,7 +44,9 @@ export function MatchCard({ match }: MatchCardProps) {
           </div>
           <div className="flex flex-row flex-wrap gap-1.5 sm:flex-col sm:items-end">
             <StatusBadge status={match.status} />
-            <StatusBadge status={match.payment_status} />
+            {isFinished && (
+              <StatusBadge status={match.payment_status} />
+            )}
           </div>
         </div>
       </div>
@@ -63,18 +66,21 @@ export function MatchCard({ match }: MatchCardProps) {
         </div>
 
         {isFinished && match.home_score != null && match.away_score != null && (
-          <div className="rounded-xl border border-stone-800 bg-stone-950/60 px-3 py-2 text-center">
-            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
-              Resultado final
-            </p>
-            <p className="text-2xl font-black text-amber-100">
-              {match.home_score} × {match.away_score}
-            </p>
-            {match.prediction?.points != null && (
-              <p className="mt-1 text-sm font-semibold text-lime-400">
-                Seus pontos: {match.prediction.points} pts
+          <div className="space-y-3">
+            <div className="rounded-xl border border-stone-800 bg-stone-950/60 px-3 py-2 text-center">
+              <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
+                Resultado final
               </p>
-            )}
+              <p className="text-2xl font-black text-amber-100">
+                {match.home_score} × {match.away_score}
+              </p>
+              {match.prediction?.points != null && (
+                <p className="mt-1 text-sm font-semibold text-lime-400">
+                  Seus pontos: {match.prediction.points} pts
+                </p>
+              )}
+            </div>
+            <MatchWinnerBanner winners={match.winners} />
           </div>
         )}
 

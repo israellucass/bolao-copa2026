@@ -9,6 +9,7 @@ export interface Database {
           id: string;
           name: string;
           whatsapp: string | null;
+          pix_key: string | null;
           email: string | null;
           password_hash: string | null;
           is_admin: boolean;
@@ -18,6 +19,7 @@ export interface Database {
           id?: string;
           name: string;
           whatsapp?: string | null;
+          pix_key?: string | null;
           email?: string | null;
           password_hash?: string | null;
           is_admin?: boolean;
@@ -27,6 +29,7 @@ export interface Database {
           id?: string;
           name?: string;
           whatsapp?: string | null;
+          pix_key?: string | null;
           email?: string | null;
           password_hash?: string | null;
           is_admin?: boolean;

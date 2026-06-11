@@ -4,8 +4,16 @@ export interface User {
   id: string;
   name: string | null;
   whatsapp: string | null;
+  pix_key: string | null;
   email: string | null;
   is_admin: boolean;
+}
+
+export interface MatchWinner {
+  user_id: string;
+  name: string;
+  pix_key: string | null;
+  points: number;
 }
 
 export interface Match {
@@ -29,7 +37,6 @@ export interface Prediction {
 }
 
 export type BetLockReason =
-  | "payment_pending"
   | "match_closed"
   | "match_finished"
   | "match_started"
@@ -40,6 +47,7 @@ export interface MatchWithMeta extends Match {
   prediction: Prediction | null;
   can_bet: boolean;
   lock_reason: BetLockReason | null;
+  winners: MatchWinner[];
 }
 
 export interface RankingEntry {

@@ -32,8 +32,8 @@ export default async function DashboardPage() {
           />
           <h1 className={theme.heading}>Jogos do Brasil</h1>
           <p className={theme.subheading}>
-            Palpites apenas na próxima partida, antes do apito inicial — com
-            pagamento confirmado.
+            Palpites na próxima partida, antes do apito inicial. O Pix ao
+            vencedor é feito depois do resultado.
           </p>
         </header>
 

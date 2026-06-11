@@ -27,7 +27,7 @@ export async function getAdminData(): Promise<{
       supabase.from("matches").select("*").order("match_date", { ascending: true }),
       supabase
         .from("users")
-        .select("id, name, whatsapp, email, is_admin")
+        .select("id, name, whatsapp, pix_key, email, is_admin")
         .order("name"),
       supabase.from("payments").select("user_id, match_id, paid"),
     ]);

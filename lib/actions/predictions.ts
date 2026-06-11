@@ -35,31 +35,20 @@ export async function savePrediction(
     return { error: "Placar inválido (0–20)." };
   }
 
-  const [{ data: match }, { data: allMatches }, { data: payment }] =
-    await Promise.all([
-      supabase.from("matches").select("*").eq("id", matchId).single(),
-      supabase
-        .from("matches")
-        .select("id, match_date, status")
-        .order("match_date", { ascending: true }),
-      supabase
-        .from("payments")
-        .select("paid")
-        .eq("user_id", user.id)
-        .eq("match_id", matchId)
-        .maybeSingle(),
-    ]);
+  const [{ data: match }, { data: allMatches }] = await Promise.all([
+    supabase.from("matches").select("*").eq("id", matchId).single(),
+    supabase
+      .from("matches")
+      .select("id, match_date, status")
+      .order("match_date", { ascending: true }),
+  ]);
 
   if (!match) {
     return { error: "Partida não encontrada." };
   }
 
   const nextMatchId = getNextBettableMatchId(allMatches ?? []);
-  const { canBet, lockReason } = getBetEligibility(
-    match,
-    payment?.paid ? "paid" : "pending",
-    nextMatchId
-  );
+  const { canBet, lockReason } = getBetEligibility(match, nextMatchId);
 
   if (!canBet && lockReason) {
     return { error: getBetLockMessage(lockReason).replace("🔒 ", "") };
