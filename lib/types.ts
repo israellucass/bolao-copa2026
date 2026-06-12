@@ -87,7 +87,8 @@ export interface MatchWithMeta extends Match {
 }
 
 export interface RankingEntry {
-  rank: number;
+  /** Posição na classificação; null enquanto o jogador não pontuou. */
+  rank: number | null;
   user_id: string;
   name: string;
   total_points: number;

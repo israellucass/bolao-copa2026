@@ -6,11 +6,15 @@ interface RankingListProps {
   currentUserId: string;
 }
 
-function getMedal(rank: number): string | null {
+function getMedal(rank: number | null): string | null {
   if (rank === 1) return "🥇";
   if (rank === 2) return "🥈";
   if (rank === 3) return "🥉";
   return null;
+}
+
+function formatRank(rank: number | null): string {
+  return rank == null ? "—" : String(rank);
 }
 
 export function RankingList({ ranking, currentUserId }: RankingListProps) {
@@ -29,8 +33,11 @@ export function RankingList({ ranking, currentUserId }: RankingListProps) {
                 isCurrentUser ? "ring-1 ring-lime-500/40" : ""
               }`}
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center text-lg font-bold text-stone-500">
-                {medal ?? entry.rank}
+              <span
+                className="flex h-10 w-10 shrink-0 items-center justify-center text-lg font-bold text-stone-500"
+                aria-label={entry.rank == null ? "Sem posição" : `Posição ${entry.rank}`}
+              >
+                {medal ?? formatRank(entry.rank)}
               </span>
               <div className="min-w-0 flex-1">
                 <p
@@ -79,7 +86,13 @@ export function RankingList({ ranking, currentUserId }: RankingListProps) {
                   }`}
                 >
                   <td className="px-4 py-3 font-bold text-stone-500">
-                    {medal ?? entry.rank}
+                    <span
+                      aria-label={
+                        entry.rank == null ? "Sem posição" : `Posição ${entry.rank}`
+                      }
+                    >
+                      {medal ?? formatRank(entry.rank)}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     <span

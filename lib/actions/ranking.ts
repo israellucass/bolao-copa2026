@@ -22,17 +22,31 @@ export async function getRanking(): Promise<RankingEntry[]> {
     }
   }
 
-  const sorted = users
+  const entries = users
     .filter((user) => user.name?.trim() && user.name.trim().length >= 2)
     .map((user) => ({
       user_id: user.id,
       name: user.name!.trim(),
       total_points: totals.get(user.id) ?? 0,
-    }))
+    }));
+
+  const withPoints = entries
+    .filter((entry) => entry.total_points > 0)
     .sort((a, b) => b.total_points - a.total_points);
 
-  return sorted.map((entry, index) => ({
+  const withoutPoints = entries
+    .filter((entry) => entry.total_points === 0)
+    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+
+  const ranked: RankingEntry[] = withPoints.map((entry, index) => ({
     rank: index + 1,
     ...entry,
   }));
+
+  const unranked: RankingEntry[] = withoutPoints.map((entry) => ({
+    rank: null,
+    ...entry,
+  }));
+
+  return [...ranked, ...unranked];
 }
