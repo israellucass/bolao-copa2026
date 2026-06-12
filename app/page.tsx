@@ -32,7 +32,7 @@ export default async function DashboardPage() {
           />
           <h1 className={theme.heading}>Jogos do Brasil</h1>
           <p className={`${theme.subheading} max-w-prose`}>
-            Palpites na próxima partida, antes do apito inicial. O Pix ao
+            Palpite em qualquer partida até o apito inicial. O Pix ao
             vencedor é feito depois do resultado.
           </p>
         </header>

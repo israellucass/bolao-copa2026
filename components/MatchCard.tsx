@@ -99,13 +99,17 @@ export function MatchCard({ match, currentUserId }: MatchCardProps) {
 
           <div>
             <p className={theme.label}>Seu palpite</p>
-            <div className="flex items-end justify-center gap-4 sm:gap-6">
-              <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
-                <label htmlFor={`home-${match.id}`} className="w-full">
+            <div className="flex items-center justify-center gap-4 sm:gap-8">
+              <div className="flex min-w-0 flex-1 flex-col items-center gap-3">
+                <label
+                  htmlFor={`home-${match.id}`}
+                  className="flex w-full flex-col items-center"
+                >
                   <TeamLabel
                     name={match.home_team}
                     size="sm"
-                    className="justify-center font-semibold text-stone-200"
+                    layout="stacked"
+                    className="font-semibold text-stone-200"
                   />
                 </label>
                 <input
@@ -119,13 +123,22 @@ export function MatchCard({ match, currentUserId }: MatchCardProps) {
                   className={theme.scoreInput}
                 />
               </div>
-              <span className="pb-4 text-2xl font-light text-stone-500">×</span>
-              <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
-                <label htmlFor={`away-${match.id}`} className="w-full">
+              <span
+                className="shrink-0 text-2xl font-light text-stone-500"
+                aria-hidden
+              >
+                ×
+              </span>
+              <div className="flex min-w-0 flex-1 flex-col items-center gap-3">
+                <label
+                  htmlFor={`away-${match.id}`}
+                  className="flex w-full flex-col items-center"
+                >
                   <TeamLabel
                     name={match.away_team}
                     size="sm"
-                    className="justify-center font-semibold text-stone-200"
+                    layout="stacked"
+                    className="font-semibold text-stone-200"
                   />
                 </label>
                 <input

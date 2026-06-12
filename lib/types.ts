@@ -75,8 +75,7 @@ export interface PredictionLogEntry {
 export type BetLockReason =
   | "match_closed"
   | "match_finished"
-  | "match_started"
-  | "not_next_match";
+  | "match_started";
 
 export interface MatchWithMeta extends Match {
   payment_status: "pending" | "paid";

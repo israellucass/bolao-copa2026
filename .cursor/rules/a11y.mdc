@@ -1,0 +1,38 @@
+---
+description: Strictly follow accessibility development rules in A11Y.md
+alwaysApply: true
+---
+
+# Accessibility (A11Y.md)
+
+**Strictly follow** the development rules defined in `A11Y.md` (project root). Treat accessibility as a pre-condition for use — if a user cannot complete a task due to an accessibility barrier, the feature is broken.
+
+## Before UI work
+
+1. Read `A11Y.md` when implementing or changing UI, forms, navigation, modals, or interactions.
+2. Do **not** infer accessibility without evidence in code or spec.
+3. Do **not** preload `references/` — consult them only when the task involves that component type.
+4. Prioritize [WAI-ARIA APG](https://www.w3.org/WAI/ARIA/apg/) patterns.
+
+## Non-negotiables
+
+- Prefer semantic HTML (`button`, `a`, `label`, `input`) over clickable `div`/`span`.
+- All functionality must work by keyboard; visible focus (never `outline: none` without a fallback).
+- Forms: explicit labels (`htmlFor`/`id` or wrapping); never placeholder-only labels.
+- Images: functional `alt` on informative images; decorative images use `alt=""`.
+- Contrast: 4.5:1 text, 3:1 UI; state never by color alone (icon + text + color).
+- Touch targets: minimum 44×44 CSS px (or documented exception per `A11Y.md`).
+- Dynamic feedback: use `aria-live`, `role="status"`, or `role="alert"` for toasts, loading, and form results.
+- Modals: focus trap, return focus on close, background inert.
+- Respect `prefers-reduced-motion`.
+
+## Severity
+
+- 🔴 CRITICAL / 🟠 HIGH — **must fix** before considering work done.
+- 🟡 MEDIUM — should fix; 🔵 LOW — may fix.
+
+## Ambiguity
+
+If a component is complex or unmapped, follow the **Complex Component Protocol** in `A11Y.md` (APG → validate → document → add to `references/`).
+
+When trade-offs arise, explain impact on accessibility vs UX vs business.

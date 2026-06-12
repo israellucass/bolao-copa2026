@@ -1,11 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import {
-  getBetEligibility,
-  getBetLockMessage,
-  getNextBettableMatchId,
-} from "../betting";
+import { getBetEligibility, getBetLockMessage } from "../betting";
 import { requireCompleteUser } from "../auth";
 import { appendPredictionLog } from "../prediction-log";
 import { supabase } from "../supabase";
@@ -36,20 +32,17 @@ export async function savePrediction(
     return { error: "Placar inválido (0–20)." };
   }
 
-  const [{ data: match }, { data: allMatches }] = await Promise.all([
-    supabase.from("matches").select("*").eq("id", matchId).single(),
-    supabase
-      .from("matches")
-      .select("id, match_date, status")
-      .order("match_date", { ascending: true }),
-  ]);
+  const { data: match } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("id", matchId)
+    .single();
 
   if (!match) {
     return { error: "Partida não encontrada." };
   }
 
-  const nextMatchId = getNextBettableMatchId(allMatches ?? []);
-  const { canBet, lockReason } = getBetEligibility(match, nextMatchId);
+  const { canBet, lockReason } = getBetEligibility(match);
 
   if (!canBet && lockReason) {
     return { error: getBetLockMessage(lockReason).replace("🔒 ", "") };

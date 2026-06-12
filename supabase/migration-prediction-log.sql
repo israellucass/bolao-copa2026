@@ -14,6 +14,7 @@ create index if not exists idx_prediction_log_match_created
 
 alter table public.prediction_log enable row level security;
 
+drop policy if exists "Allow all for anon" on public.prediction_log;
 create policy "Allow all for anon" on public.prediction_log
   for all using (true) with check (true);
 
