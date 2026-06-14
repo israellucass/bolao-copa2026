@@ -26,7 +26,11 @@ export function MatchWinnersHighlight({
         </p>
         {loserEntry && (
           <p className="mt-1 text-sm font-semibold text-amber-100">
-            Envie {formatCurrencyBRL(loserEntry.amount_due)} via Pix
+            Envie {formatCurrencyBRL(settlement.bet_amount_brl)} via Pix
+            <span className="font-normal text-stone-400">
+              {" "}
+              (valor da aposta)
+            </span>
           </p>
         )}
       </div>

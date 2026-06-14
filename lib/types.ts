@@ -35,6 +35,8 @@ export interface MatchPrizeSettlement {
   participant_count: number;
   winner_count: number;
   prize_per_winner: number;
+  /** Valor da aposta por jogador nesta partida. */
+  bet_amount_brl: number;
   winners: MatchWinner[];
   losers: MatchLoserDebt[];
 }

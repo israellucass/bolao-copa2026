@@ -141,8 +141,8 @@ export function MatchSettlementPanel({
             Quem deve pagar
           </p>
           <p className="text-sm text-stone-300">
-            Cada jogador abaixo envia Pix ao(s) vencedor(es) conforme o valor
-            calculado.
+            Cada jogador abaixo envia {formatCurrencyBRL(settlement.bet_amount_brl)}{" "}
+            via Pix ao(s) vencedor(es).
           </p>
           <ul className="divide-y divide-stone-800/80 rounded-lg border border-stone-800 bg-stone-950/40">
             {losers.map((loser) => (
@@ -192,7 +192,7 @@ export function MatchSettlementPanel({
 
       {currentLoser && (
         <p className="rounded-lg border border-amber-900/40 bg-amber-950/30 px-3 py-2 text-center text-sm font-semibold text-amber-200">
-          Você deve {formatCurrencyBRL(currentLoser.amount_due)} via Pix ao(s)
+          Você deve {formatCurrencyBRL(settlement.bet_amount_brl)} via Pix ao(s)
           vencedor(es).
         </p>
       )}

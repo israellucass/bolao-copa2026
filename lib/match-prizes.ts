@@ -18,7 +18,7 @@ function resolveUserInfo(
 }
 
 export function computeSettlement(
-  matchPot: number,
+  costBrl: number,
   carryIn: number,
   participants: {
     user_id: string;
@@ -31,6 +31,7 @@ export function computeSettlement(
     return { settlement: null, nextCarry: carryIn };
   }
 
+  const matchPot = participants.length * costBrl;
   const totalPot = carryIn + matchPot;
   const maxPoints = Math.max(...participants.map((p) => p.points));
   const winners =
@@ -45,10 +46,10 @@ export function computeSettlement(
   const winnerIds = new Set(winners.map((w) => w.user_id));
   const losers = participants.filter((p) => !winnerIds.has(p.user_id));
   const prizePerWinner = totalPot / winners.length;
-  const amountDuePerLoser =
-    losers.length > 0 ? totalPot / losers.length : 0;
+  /** Cada perdedor paga o valor da aposta — não a divisão do pote total. */
+  const amountDuePerLoser = costBrl;
   const amountPerWinnerFromLoser =
-    losers.length > 0 ? amountDuePerLoser / winners.length : 0;
+    winners.length > 0 ? costBrl / winners.length : 0;
 
   return {
     settlement: {
@@ -58,6 +59,7 @@ export function computeSettlement(
       participant_count: participants.length,
       winner_count: winners.length,
       prize_per_winner: prizePerWinner,
+      bet_amount_brl: costBrl,
       winners: winners.map((w) => ({
         user_id: w.user_id,
         name: w.name,
@@ -119,9 +121,8 @@ export async function getMatchPrizeSettlementsMap(
       };
     });
 
-    const matchPot = participants.length * match.cost_brl;
     const { settlement, nextCarry } = computeSettlement(
-      matchPot,
+      match.cost_brl,
       carryIn,
       participants
     );
