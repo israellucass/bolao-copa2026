@@ -14,11 +14,17 @@ export default async function DashboardPage() {
   const upcoming = matches.filter((m) => m.status !== "finished");
   const past = matches.filter((m) => m.status === "finished");
 
-  const paymentDue = past.filter((m) =>
-    userIsLoser(m.prize_settlement, user.id)
+  const paymentDue = past.filter(
+    (m) =>
+      userIsLoser(m.prize_settlement, user.id) &&
+      m.payment_status === "pending"
   );
   const pastOther = past.filter(
-    (m) => !userIsLoser(m.prize_settlement, user.id)
+    (m) =>
+      !(
+        userIsLoser(m.prize_settlement, user.id) &&
+        m.payment_status === "pending"
+      )
   );
 
   const sortedPaymentDue = [...paymentDue].sort(

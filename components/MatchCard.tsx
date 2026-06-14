@@ -41,7 +41,8 @@ export function MatchCard({
   const settlement = match.prize_settlement;
   const isLoser = isFinished && userIsLoser(settlement, currentUserId);
   const isWinner = isFinished && userIsWinner(settlement, currentUserId);
-  const showLoserHighlight = emphasized || isLoser;
+  const owesPayment = isLoser && match.payment_status === "pending";
+  const showLoserHighlight = owesPayment && emphasized;
 
   return (
     <article
@@ -105,6 +106,21 @@ export function MatchCard({
 
         {isFinished && match.home_score != null && match.away_score != null && (
           <div className="space-y-4">
+            {showLoserHighlight && settlement && (
+              <MatchWinnersHighlight
+                settlement={settlement}
+                currentUserId={currentUserId}
+              />
+            )}
+
+            {settlement && isWinner && (
+              <MatchSettlementPanel
+                settlement={settlement}
+                currentUserId={currentUserId}
+                variant="winner"
+              />
+            )}
+
             <div
               className={cn(
                 "rounded-xl border px-4 py-4 text-center",
@@ -136,21 +152,6 @@ export function MatchCard({
                 </p>
               )}
             </div>
-
-            {showLoserHighlight && settlement && (
-              <MatchWinnersHighlight
-                settlement={settlement}
-                currentUserId={currentUserId}
-              />
-            )}
-
-            {settlement && isWinner && (
-              <MatchSettlementPanel
-                settlement={settlement}
-                currentUserId={currentUserId}
-                variant="winner"
-              />
-            )}
 
             {!settlement && (
               <p className="rounded-xl border border-stone-800 bg-stone-950/50 px-4 py-3 text-center text-sm text-stone-400">
