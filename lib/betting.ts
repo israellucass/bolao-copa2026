@@ -33,19 +33,36 @@ export function getBetLockMessage(reason: BetLockReason): string {
       return "🔒 Partida já finalizada.";
     case "match_started":
       return "🔒 Partida já começou — palpites encerrados.";
+    case "payment_overdue":
+      return "🔒 Pix pendente de rodada anterior — regularize para palpitar.";
   }
 }
 
 export function enrichMatchesWithBetting(
-  matches: Omit<MatchWithMeta, "can_bet" | "lock_reason">[],
+  matches: Omit<
+    MatchWithMeta,
+    "can_bet" | "lock_reason" | "bet_lock_message"
+  >[],
+  paymentBlockMessages: Map<string, string>,
   now = Date.now()
 ): MatchWithMeta[] {
   return matches.map((match) => {
+    const paymentMessage = paymentBlockMessages.get(match.id);
+    if (paymentMessage) {
+      return {
+        ...match,
+        can_bet: false,
+        lock_reason: "payment_overdue",
+        bet_lock_message: paymentMessage,
+      };
+    }
+
     const { canBet, lockReason } = getBetEligibility(match, now);
     return {
       ...match,
       can_bet: canBet,
       lock_reason: lockReason,
+      bet_lock_message: null,
     };
   });
 }

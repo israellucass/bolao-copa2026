@@ -26,6 +26,7 @@ create table if not exists public.matches (
   status text not null default 'open' check (status in ('open', 'closed', 'finished')),
   home_score int,
   away_score int,
+  finished_at timestamptz,
   external_fixture_id int unique,
   created_at timestamptz not null default now()
 );

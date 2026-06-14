@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getBetEligibility, getBetLockMessage } from "../betting";
 import { requireCompleteUser } from "../auth";
 import { appendPredictionLog } from "../prediction-log";
+import { checkPaymentBlockForBet } from "./payment-check";
 import { supabase } from "../supabase";
 
 export type PredictionState = {
@@ -46,6 +47,11 @@ export async function savePrediction(
 
   if (!canBet && lockReason) {
     return { error: getBetLockMessage(lockReason).replace("🔒 ", "") };
+  }
+
+  const paymentBlock = await checkPaymentBlockForBet(user.id, matchId);
+  if (paymentBlock) {
+    return { error: paymentBlock.message };
   }
 
   const { data: existing } = await supabase

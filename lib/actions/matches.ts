@@ -4,6 +4,7 @@ import { enrichMatchesWithBetting } from "../betting";
 import { requireCompleteUser } from "../auth";
 import { getMatchPrizeSettlementsMap } from "../match-prizes";
 import { getPredictionLogsMap } from "../prediction-log";
+import { buildPaymentBlockMessages } from "../payment-enforcement";
 import { supabase } from "../supabase";
 import type { MatchWithMeta } from "../types";
 
@@ -55,5 +56,17 @@ export async function getMatchesForUser(): Promise<MatchWithMeta[]> {
     prediction_log: logsMap.get(match.id) ?? [],
   }));
 
-  return enrichMatchesWithBetting(withMeta);
+  const paymentBlockMessages = buildPaymentBlockMessages({
+    userId: user.id,
+    matches,
+    settlements: settlementsMap,
+    paidByMatchId: new Map(
+      (payments ?? []).map((p) => [p.match_id, p.paid])
+    ),
+    predictedMatchIds: new Set(
+      (predictions ?? []).map((p) => p.match_id)
+    ),
+  });
+
+  return enrichMatchesWithBetting(withMeta, paymentBlockMessages);
 }

@@ -46,6 +46,7 @@ export interface Database {
           status: MatchStatus;
           home_score: number | null;
           away_score: number | null;
+          finished_at: string | null;
           created_at: string;
         };
         Insert: {

@@ -50,6 +50,7 @@ export interface Match {
   status: MatchStatus;
   home_score: number | null;
   away_score: number | null;
+  finished_at?: string | null;
 }
 
 export interface Prediction {
@@ -77,13 +78,15 @@ export interface PredictionLogEntry {
 export type BetLockReason =
   | "match_closed"
   | "match_finished"
-  | "match_started";
+  | "match_started"
+  | "payment_overdue";
 
 export interface MatchWithMeta extends Match {
   payment_status: "pending" | "paid";
   prediction: Prediction | null;
   can_bet: boolean;
   lock_reason: BetLockReason | null;
+  bet_lock_message: string | null;
   prize_settlement: MatchPrizeSettlement | null;
   prediction_log: PredictionLogEntry[];
 }

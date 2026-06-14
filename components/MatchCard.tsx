@@ -223,11 +223,20 @@ export function MatchCard({
               </div>
             </div>
 
-            {!canBet && match.lock_reason && (
-              <p className={theme.alertWarning}>
-                {getBetLockMessage(match.lock_reason)}
-              </p>
-            )}
+          {!canBet && match.bet_lock_message && (
+            <p
+              className="rounded-xl border border-red-900/60 bg-red-950/40 px-3 py-3 text-center text-sm font-bold leading-snug text-red-200"
+              role="alert"
+            >
+              {match.bet_lock_message}
+            </p>
+          )}
+
+          {!canBet && match.lock_reason && !match.bet_lock_message && (
+            <p className={theme.alertWarning}>
+              {getBetLockMessage(match.lock_reason)}
+            </p>
+          )}
 
             {state.error && <p className={theme.alertError}>{state.error}</p>}
             {state.success && (

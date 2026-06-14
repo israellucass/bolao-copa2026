@@ -160,12 +160,19 @@ export async function finishMatchWithScore(
     return { error: "Placar final inválido (0–20)." };
   }
 
+  const { data: existingMatch } = await supabase
+    .from("matches")
+    .select("finished_at")
+    .eq("id", matchId)
+    .single();
+
   const { error: matchError } = await supabase
     .from("matches")
     .update({
       status: "finished",
       home_score: homeScore,
       away_score: awayScore,
+      finished_at: existingMatch?.finished_at ?? new Date().toISOString(),
     })
     .eq("id", matchId);
 
