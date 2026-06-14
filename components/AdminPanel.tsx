@@ -11,6 +11,7 @@ import {
 import { syncBrazilMatches } from "@/lib/actions/sync-matches";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { MatchTeams } from "@/components/MatchTeams";
+import { TeamLabel } from "@/components/TeamLabel";
 import { formatCurrencyBRL, formatMatchDate, formatTeamName } from "@/lib/format";
 import { theme } from "@/lib/theme";
 import type { Match, User } from "@/lib/types";
@@ -40,6 +41,7 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
   const [selectedMatchId, setSelectedMatchId] = useState(
     matches[0]?.id ?? ""
   );
+  const [finishMatchId, setFinishMatchId] = useState("");
   const [statusPending, startStatusTransition] = useTransition();
   const [paymentPending, startPaymentTransition] = useTransition();
 
@@ -51,6 +53,7 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
   );
 
   const selectedMatch = matches.find((m) => m.id === selectedMatchId);
+  const finishMatch = matches.find((m) => m.id === finishMatchId);
 
   function handleStatusChange(matchId: string, status: "open" | "closed" | "finished") {
     startStatusTransition(async () => {
@@ -287,12 +290,22 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           Lançar resultado
         </h2>
         <p className={`mb-3 ${theme.subheading}`}>
-          Ao salvar o placar final, a pontuação de todos os palpites é
-          calculada automaticamente.
+          Informe o placar final. A pontuação é calculada e quem tiver mais
+          pontos vira vencedor da rodada.
         </p>
 
         <form action={finishAction} className="space-y-3">
-          <select name="match_id" required className={theme.select}>
+          <label htmlFor="finish-match" className={theme.label}>
+            Partida
+          </label>
+          <select
+            id="finish-match"
+            name="match_id"
+            required
+            value={finishMatchId}
+            onChange={(e) => setFinishMatchId(e.target.value)}
+            className={theme.select}
+          >
             <option value="">Selecione a partida</option>
             {matches
               .filter((m) => m.status !== "finished")
@@ -303,46 +316,62 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
               ))}
           </select>
 
-          {selectedMatch && (
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-stone-300">
-                Partida selecionada nos pagamentos:
-              </p>
-              <MatchTeams
-                homeTeam={selectedMatch.home_team}
-                awayTeam={selectedMatch.away_team}
-                size="sm"
-              />
+          {finishMatch && (
+            <div className="flex items-center justify-center gap-4 sm:gap-8">
+              <div className="flex flex-col items-center gap-3">
+                <label
+                  htmlFor="finish-home-score"
+                  className="flex flex-col items-center"
+                >
+                  <TeamLabel
+                    name={finishMatch.home_team}
+                    size="sm"
+                    layout="stacked"
+                    className="font-semibold text-stone-200"
+                  />
+                </label>
+                <input
+                  id="finish-home-score"
+                  name="home_score"
+                  type="number"
+                  min={0}
+                  max={20}
+                  required
+                  defaultValue={0}
+                  className={theme.scoreInput}
+                />
+              </div>
+              <span
+                className="shrink-0 text-2xl font-light text-stone-500"
+                aria-hidden
+              >
+                ×
+              </span>
+              <div className="flex flex-col items-center gap-3">
+                <label
+                  htmlFor="finish-away-score"
+                  className="flex flex-col items-center"
+                >
+                  <TeamLabel
+                    name={finishMatch.away_team}
+                    size="sm"
+                    layout="stacked"
+                    className="font-semibold text-stone-200"
+                  />
+                </label>
+                <input
+                  id="finish-away-score"
+                  name="away_score"
+                  type="number"
+                  min={0}
+                  max={20}
+                  required
+                  defaultValue={0}
+                  className={theme.scoreInput}
+                />
+              </div>
             </div>
           )}
-
-          <div className="flex items-center justify-center gap-4">
-            <div className="text-center">
-              <label className={theme.labelInline}>Mandante</label>
-              <input
-                name="home_score"
-                type="number"
-                min={0}
-                max={20}
-                required
-                defaultValue={0}
-                className={theme.scoreInput}
-              />
-            </div>
-            <span className="pt-5 text-stone-600">×</span>
-            <div className="text-center">
-              <label className={theme.labelInline}>Visitante</label>
-              <input
-                name="away_score"
-                type="number"
-                min={0}
-                max={20}
-                required
-                defaultValue={0}
-                className={theme.scoreInput}
-              />
-            </div>
-          </div>
 
           {finishState.error && (
             <p className="text-xs text-red-300">{finishState.error}</p>
@@ -353,10 +382,10 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
 
           <button
             type="submit"
-            disabled={finishPending}
+            disabled={finishPending || !finishMatchId}
             className={`${theme.btnPrimary} w-full`}
           >
-            {finishPending ? "Calculando..." : "Finalizar e calcular pontos"}
+            {finishPending ? "Finalizando..." : "Finalizar partida"}
           </button>
         </form>
       </section>

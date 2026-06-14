@@ -3,6 +3,7 @@ import { GrileirosMascot } from "@/components/GrileirosMascot";
 import { MatchCard } from "@/components/MatchCard";
 import { getMatchesForUser } from "@/lib/actions/matches";
 import { requireCompleteUser } from "@/lib/auth";
+import { userIsLoser } from "@/lib/match-settlement";
 import { theme } from "@/lib/theme";
 
 export default async function DashboardPage() {
@@ -13,11 +14,22 @@ export default async function DashboardPage() {
   const upcoming = matches.filter((m) => m.status !== "finished");
   const past = matches.filter((m) => m.status === "finished");
 
+  const paymentDue = past.filter((m) =>
+    userIsLoser(m.prize_settlement, user.id)
+  );
+  const pastOther = past.filter(
+    (m) => !userIsLoser(m.prize_settlement, user.id)
+  );
+
+  const sortedPaymentDue = [...paymentDue].sort(
+    (a, b) =>
+      new Date(b.match_date).getTime() - new Date(a.match_date).getTime()
+  );
   const sortedUpcoming = [...upcoming].sort(
     (a, b) =>
       new Date(a.match_date).getTime() - new Date(b.match_date).getTime()
   );
-  const sortedPast = [...past].sort(
+  const sortedPast = [...pastOther].sort(
     (a, b) =>
       new Date(b.match_date).getTime() - new Date(a.match_date).getTime()
   );
@@ -51,6 +63,22 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-6 sm:space-y-8">
+            {sortedPaymentDue.length > 0 && (
+              <section className="space-y-3 sm:space-y-4">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-amber-300 sm:text-sm">
+                  Envie o Pix ao vencedor
+                </h2>
+                {sortedPaymentDue.map((match) => (
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    currentUserId={user.id}
+                    emphasized
+                  />
+                ))}
+              </section>
+            )}
+
             {sortedUpcoming.length > 0 && (
               <section className="space-y-3 sm:space-y-4">
                 <h2 className={theme.sectionTitle}>Próximas partidas</h2>

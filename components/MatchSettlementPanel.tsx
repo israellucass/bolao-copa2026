@@ -6,11 +6,13 @@ import type { MatchPrizeSettlement } from "@/lib/types";
 interface MatchSettlementPanelProps {
   settlement: MatchPrizeSettlement;
   currentUserId: string;
+  variant?: "full" | "winner";
 }
 
 export function MatchSettlementPanel({
   settlement,
   currentUserId,
+  variant = "full",
 }: MatchSettlementPanelProps) {
   const {
     match_pot,
@@ -29,6 +31,36 @@ export function MatchSettlementPanel({
     winner_count === 1
       ? "Vencedor da rodada"
       : `Vencedores empatados (${winner_count})`;
+
+  if (variant === "winner" && currentWinner) {
+    return (
+      <div className="space-y-3 rounded-xl border border-lime-800/50 bg-lime-950/30 px-4 py-4">
+        <p className="text-sm font-bold uppercase tracking-wide text-lime-400">
+          {winnerTitle}
+        </p>
+        <p className="text-base font-semibold text-amber-50">
+          Parabéns! Você recebe{" "}
+          <span className="text-lime-400">
+            {formatCurrencyBRL(currentWinner.prize_amount)}
+          </span>{" "}
+          nesta rodada ({currentWinner.points} pts).
+        </p>
+        <div className="space-y-1 text-sm text-stone-300">
+          <p>
+            Pote total:{" "}
+            <span className="font-semibold text-amber-100">
+              {formatCurrencyBRL(total_pot)}
+            </span>
+          </p>
+          {winner_count > 1 && (
+            <p className="text-xs text-stone-400">
+              Dividido entre {winner_count} vencedores.
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

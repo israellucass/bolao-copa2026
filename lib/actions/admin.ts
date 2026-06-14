@@ -176,5 +176,5 @@ export async function finishMatchWithScore(
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/ranking");
-  return { success: "Partida finalizada e pontuação calculada!" };
+  return { success: "Partida finalizada! Pontuação e vencedor(es) definidos." };
 }
