@@ -30,7 +30,7 @@ const settlement: MatchPrizeSettlement = {
 };
 
 test("formatElapsedHhMm", () => {
-  assert.equal(formatElapsedHhMm(90 * 60_000), "01:30");
+  assert.equal(formatElapsedHhMm(90 * 60_000), "01h30min");
 });
 
 test("formatWinnerNamesPt", () => {
@@ -166,5 +166,5 @@ test("winner and paid users not blocked", () => {
 
 assert.match(
   formatCaloteiroMessage(["Hudson", "Lucas"], 25 * 60 * 60_000 + 30 * 60_000),
-  /Pague Hudson e Lucas, caloteiro! Você está devendo há 25:30/
+  /Pague Hudson e Lucas, caloteiro! Você está devendo há 25h30min/
 );

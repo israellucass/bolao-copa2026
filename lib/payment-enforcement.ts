@@ -18,7 +18,7 @@ export function formatElapsedHhMm(elapsedMs: number): string {
   const totalMinutes = Math.max(0, Math.floor(elapsedMs / 60_000));
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  return `${String(hours).padStart(2, "0")}h${String(minutes).padStart(2, "0")}min`;
 }
 
 export function formatWinnerNamesPt(names: string[]): string {
