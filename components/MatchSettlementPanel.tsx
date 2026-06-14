@@ -119,8 +119,10 @@ export function MatchSettlementPanel({
             {winner.pix_key ? (
               <div className="mt-3 flex items-start gap-2">
                 <div className="min-w-0 flex-1">
-                  <p className={theme.labelInline}>Chave Pix</p>
-                  <p className="break-all text-sm font-medium text-amber-50">
+                  <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
+                    Chave Pix
+                  </p>
+                  <p className="mt-0.5 break-all text-sm font-medium text-amber-50">
                     {winner.pix_key}
                   </p>
                 </div>
