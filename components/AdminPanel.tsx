@@ -13,6 +13,11 @@ import { CurrencyInput } from "@/components/CurrencyInput";
 import { MatchTeams } from "@/components/MatchTeams";
 import { TeamLabel } from "@/components/TeamLabel";
 import { formatCurrencyBRL, formatMatchDate, formatTeamName } from "@/lib/format";
+import {
+  matchHasFinalScore,
+  matchNeedsScoreEntry,
+  matchScorePending,
+} from "@/lib/match-score";
 import { theme } from "@/lib/theme";
 import type { Match, User } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
@@ -54,6 +59,8 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
 
   const selectedMatch = matches.find((m) => m.id === selectedMatchId);
   const finishMatch = matches.find((m) => m.id === finishMatchId);
+  const scorePendingMatches = matches.filter(matchScorePending);
+  const finishableMatches = matches.filter(matchNeedsScoreEntry);
 
   function handleStatusChange(matchId: string, status: "open" | "closed" | "finished") {
     startStatusTransition(async () => {
@@ -69,6 +76,30 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
 
   return (
     <div className="space-y-6">
+      {scorePendingMatches.length > 0 && (
+        <section
+          className="rounded-2xl border border-amber-700/60 bg-amber-950/30 px-4 py-4 ring-1 ring-amber-600/30"
+          role="status"
+        >
+          <p className="text-sm font-bold text-amber-200">
+            Placar pendente ({scorePendingMatches.length})
+          </p>
+          <p className={`mt-1 ${theme.subheading}`}>
+            {scorePendingMatches.length === 1
+              ? "Esta partida foi finalizada sem placar. Lance o resultado abaixo para calcular pontos e vencedores."
+              : "Estas partidas foram finalizadas sem placar. Lance os resultados abaixo para calcular pontos e vencedores."}
+          </p>
+          <ul className="mt-3 space-y-1.5 text-sm text-amber-100">
+            {scorePendingMatches.map((match) => (
+              <li key={match.id}>
+                {formatTeamName(match.home_team)} vs{" "}
+                {formatTeamName(match.away_team)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {/* API Sync */}
       <section className={theme.cardInner}>
         <h2 className="mb-1 text-base font-bold text-amber-100">
@@ -171,10 +202,17 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           <p className={theme.subheading}>Nenhuma partida cadastrada.</p>
         ) : (
           <div className="space-y-3">
-            {matches.map((match) => (
+            {matches.map((match) => {
+              const scorePending = matchScorePending(match);
+
+              return (
               <div
                 key={match.id}
-                className="rounded-xl border border-stone-800 bg-stone-950/50 p-3"
+                className={`rounded-xl border bg-stone-950/50 p-3 ${
+                  scorePending
+                    ? "border-amber-700/60 ring-1 ring-amber-600/20"
+                    : "border-stone-800"
+                }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 space-y-1.5">
@@ -187,8 +225,25 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
                       {formatMatchDate(match.match_date)} ·{" "}
                       {formatCurrencyBRL(match.cost_brl)}
                     </p>
+                    {scorePending && (
+                      <p className="text-xs font-semibold text-amber-300">
+                        Placar pendente — lance o resultado
+                      </p>
+                    )}
+                    {matchHasFinalScore(match) && (
+                      <p className="text-xs font-medium text-stone-400">
+                        Resultado: {match.home_score} × {match.away_score}
+                      </p>
+                    )}
                   </div>
-                  <StatusBadge status={match.status} />
+                  <div className="flex shrink-0 flex-col items-end gap-1.5">
+                    <StatusBadge status={match.status} />
+                    {scorePending && (
+                      <span className="inline-flex items-center rounded-full bg-amber-950 px-2.5 py-0.5 text-xs font-semibold text-amber-300 ring-1 ring-inset ring-amber-800">
+                        Placar pendente
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {(["open", "closed", "finished"] as const).map((status) => (
@@ -212,7 +267,8 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
                   ))}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
@@ -307,11 +363,10 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
             className={theme.select}
           >
             <option value="">Selecione a partida</option>
-            {matches
-              .filter((m) => m.status !== "finished")
-              .map((m) => (
+            {finishableMatches.map((m) => (
                 <option key={m.id} value={m.id}>
                   {formatTeamName(m.home_team)} vs {formatTeamName(m.away_team)}
+                  {matchScorePending(m) ? " (placar pendente)" : ""}
                 </option>
               ))}
           </select>
