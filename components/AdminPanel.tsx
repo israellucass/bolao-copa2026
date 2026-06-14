@@ -15,7 +15,6 @@ import { TeamLabel } from "@/components/TeamLabel";
 import { formatCurrencyBRL, formatMatchDate, formatTeamName } from "@/lib/format";
 import {
   matchHasFinalScore,
-  matchNeedsScoreEntry,
   matchScorePending,
 } from "@/lib/match-score";
 import { theme } from "@/lib/theme";
@@ -28,6 +27,117 @@ interface AdminPanelProps {
   matches: Match[];
   users: User[];
   payments: { user_id: string; match_id: string; paid: boolean }[];
+}
+
+interface MatchScoreEntryFormProps {
+  match: Match;
+  action: (payload: FormData) => void;
+  pending: boolean;
+  state: AdminState;
+  submitLabel: string;
+  onCancel?: () => void;
+}
+
+function MatchScoreEntryForm({
+  match,
+  action,
+  pending,
+  state,
+  submitLabel,
+  onCancel,
+}: MatchScoreEntryFormProps) {
+  const defaultHome = match.home_score ?? 0;
+  const defaultAway = match.away_score ?? 0;
+
+  return (
+    <form
+      action={action}
+      className="mt-3 space-y-3 rounded-xl border border-lime-800/40 bg-stone-950/60 p-3"
+    >
+      <input type="hidden" name="match_id" value={match.id} />
+      <p className="text-sm font-semibold text-lime-400">Placar final</p>
+      <p className="text-xs text-stone-400">
+        Informe o resultado para calcular pontos e definir o(s) vencedor(es).
+      </p>
+
+      <div className="flex items-center justify-center gap-4 sm:gap-8">
+        <div className="flex flex-col items-center gap-3">
+          <label
+            htmlFor={`score-home-${match.id}`}
+            className="flex flex-col items-center"
+          >
+            <TeamLabel
+              name={match.home_team}
+              size="sm"
+              layout="stacked"
+              className="font-semibold text-stone-200"
+            />
+          </label>
+          <input
+            id={`score-home-${match.id}`}
+            name="home_score"
+            type="number"
+            min={0}
+            max={20}
+            required
+            defaultValue={defaultHome}
+            className={theme.scoreInput}
+          />
+        </div>
+        <span
+          className="shrink-0 text-2xl font-light text-stone-500"
+          aria-hidden
+        >
+          ×
+        </span>
+        <div className="flex flex-col items-center gap-3">
+          <label
+            htmlFor={`score-away-${match.id}`}
+            className="flex flex-col items-center"
+          >
+            <TeamLabel
+              name={match.away_team}
+              size="sm"
+              layout="stacked"
+              className="font-semibold text-stone-200"
+            />
+          </label>
+          <input
+            id={`score-away-${match.id}`}
+            name="away_score"
+            type="number"
+            min={0}
+            max={20}
+            required
+            defaultValue={defaultAway}
+            className={theme.scoreInput}
+          />
+        </div>
+      </div>
+
+      {state.error && <p className="text-xs text-red-300">{state.error}</p>}
+      {state.success && <p className="text-xs text-lime-400">{state.success}</p>}
+
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="submit"
+          disabled={pending}
+          className={`${theme.btnPrimary} flex-1`}
+        >
+          {pending ? "Salvando..." : submitLabel}
+        </button>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className={`${theme.btnGhost} px-4`}
+          >
+            Cancelar
+          </button>
+        )}
+      </div>
+    </form>
+  );
 }
 
 export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
@@ -46,7 +156,8 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
   const [selectedMatchId, setSelectedMatchId] = useState(
     matches[0]?.id ?? ""
   );
-  const [finishMatchId, setFinishMatchId] = useState("");
+  const [showImportSync, setShowImportSync] = useState(false);
+  const [scoringMatchId, setScoringMatchId] = useState<string | null>(null);
   const [statusPending, startStatusTransition] = useTransition();
   const [paymentPending, startPaymentTransition] = useTransition();
 
@@ -57,12 +168,9 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
     payments.map((p) => [paymentKey(p.user_id, p.match_id), p.paid])
   );
 
-  const selectedMatch = matches.find((m) => m.id === selectedMatchId);
-  const finishMatch = matches.find((m) => m.id === finishMatchId);
   const scorePendingMatches = matches.filter(matchScorePending);
-  const finishableMatches = matches.filter(matchNeedsScoreEntry);
 
-  function handleStatusChange(matchId: string, status: "open" | "closed" | "finished") {
+  function handleStatusChange(matchId: string, status: "open" | "closed") {
     startStatusTransition(async () => {
       await updateMatchStatus(matchId, status);
     });
@@ -72,6 +180,10 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
     startPaymentTransition(async () => {
       await togglePayment(userId, matchId, paid);
     });
+  }
+
+  function openScoreForm(matchId: string) {
+    setScoringMatchId(matchId);
   }
 
   return (
@@ -85,53 +197,59 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
             Placar pendente ({scorePendingMatches.length})
           </p>
           <p className={`mt-1 ${theme.subheading}`}>
-            {scorePendingMatches.length === 1
-              ? "Esta partida foi finalizada sem placar. Lance o resultado abaixo para calcular pontos e vencedores."
-              : "Estas partidas foram finalizadas sem placar. Lance os resultados abaixo para calcular pontos e vencedores."}
+            Lance o resultado em Gerenciar partidas para calcular pontos e
+            vencedores.
           </p>
-          <ul className="mt-3 space-y-1.5 text-sm text-amber-100">
-            {scorePendingMatches.map((match) => (
-              <li key={match.id}>
-                {formatTeamName(match.home_team)} vs{" "}
-                {formatTeamName(match.away_team)}
-              </li>
-            ))}
-          </ul>
         </section>
       )}
 
-      {/* API Sync */}
+      {/* API Sync — collapsed */}
       <section className={theme.cardInner}>
-        <h2 className="mb-1 text-base font-bold text-amber-100">
-          Importar jogos do Brasil
-        </h2>
-        <p className={`mb-3 ${theme.subheading}`}>
-          Busca automaticamente os jogos da Seleção na Copa 2026 via
-          football-data.org.
-        </p>
-        <form action={syncAction} className="space-y-3">
-          <CurrencyInput
-            id="sync-cost-brl"
-            name="cost_brl"
-            label="Valor da aposta"
-            required
-          />
-          {syncState.error && (
-            <p className="text-xs text-red-300">{syncState.error}</p>
-          )}
-          {syncState.success && (
-            <p className="text-xs text-lime-400">{syncState.success}</p>
-          )}
-          <button
-            type="submit"
-            disabled={syncPending}
-            className={`${theme.btnPrimary} w-full`}
-          >
-            {syncPending
-              ? "Buscando jogos..."
-              : "Importar jogos da Copa 2026"}
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={() => setShowImportSync((open) => !open)}
+          className="flex w-full items-center justify-between gap-3 text-left"
+          aria-expanded={showImportSync}
+        >
+          <span className="text-base font-bold text-amber-100">
+            Importar jogos do Brasil
+          </span>
+          <span className="shrink-0 text-stone-500" aria-hidden>
+            {showImportSync ? "▾" : "▸"}
+          </span>
+        </button>
+
+        {showImportSync && (
+          <div className="mt-3 border-t border-stone-800 pt-3">
+            <p className={`mb-3 ${theme.subheading}`}>
+              Busca automaticamente os jogos da Seleção na Copa 2026 via
+              football-data.org.
+            </p>
+            <form action={syncAction} className="space-y-3">
+              <CurrencyInput
+                id="sync-cost-brl"
+                name="cost_brl"
+                label="Valor da aposta"
+                required
+              />
+              {syncState.error && (
+                <p className="text-xs text-red-300">{syncState.error}</p>
+              )}
+              {syncState.success && (
+                <p className="text-xs text-lime-400">{syncState.success}</p>
+              )}
+              <button
+                type="submit"
+                disabled={syncPending}
+                className={`${theme.btnPrimary} w-full`}
+              >
+                {syncPending
+                  ? "Buscando jogos..."
+                  : "Importar jogos da Copa 2026"}
+              </button>
+            </form>
+          </div>
+        )}
       </section>
 
       {/* Create Match */}
@@ -193,80 +311,138 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
         </form>
       </section>
 
-      {/* Match list & status */}
+      {/* Match list, status & score entry */}
       <section className={theme.cardInner}>
-        <h2 className="mb-3 text-base font-bold text-amber-100">
+        <h2 className="mb-1 text-base font-bold text-amber-100">
           Gerenciar partidas
         </h2>
+        <p className={`mb-3 ${theme.subheading}`}>
+          Para finalizar, informe o placar. Partidas já finalizadas podem ter o
+          resultado editado.
+        </p>
         {matches.length === 0 ? (
           <p className={theme.subheading}>Nenhuma partida cadastrada.</p>
         ) : (
           <div className="space-y-3">
             {matches.map((match) => {
               const scorePending = matchScorePending(match);
+              const hasScore = matchHasFinalScore(match);
+              const isFinished = match.status === "finished";
+              const showScoreForm =
+                scoringMatchId === match.id || scorePending;
 
               return (
-              <div
-                key={match.id}
-                className={`rounded-xl border bg-stone-950/50 p-3 ${
-                  scorePending
-                    ? "border-amber-700/60 ring-1 ring-amber-600/20"
-                    : "border-stone-800"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 space-y-1.5">
-                    <MatchTeams
-                      homeTeam={match.home_team}
-                      awayTeam={match.away_team}
-                      size="sm"
+                <div
+                  key={match.id}
+                  className={`rounded-xl border bg-stone-950/50 p-3 ${
+                    scorePending
+                      ? "border-amber-700/60 ring-1 ring-amber-600/20"
+                      : "border-stone-800"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 space-y-1.5">
+                      <MatchTeams
+                        homeTeam={match.home_team}
+                        awayTeam={match.away_team}
+                        size="sm"
+                      />
+                      <p className={theme.meta}>
+                        {formatMatchDate(match.match_date)} ·{" "}
+                        {formatCurrencyBRL(match.cost_brl)}
+                      </p>
+                      {scorePending && (
+                        <p className="text-xs font-semibold text-amber-300">
+                          Placar pendente — informe o resultado
+                        </p>
+                      )}
+                      {hasScore && (
+                        <p className="text-xs font-medium text-stone-400">
+                          Resultado: {match.home_score} × {match.away_score}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex shrink-0 flex-col items-end gap-1.5">
+                      <StatusBadge status={match.status} />
+                      {scorePending && (
+                        <span className="inline-flex items-center rounded-full bg-amber-950 px-2.5 py-0.5 text-xs font-semibold text-amber-300 ring-1 ring-inset ring-amber-800">
+                          Placar pendente
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {(["open", "closed"] as const).map((status) => (
+                      <button
+                        key={status}
+                        type="button"
+                        disabled={
+                          statusPending || isFinished || match.status === status
+                        }
+                        onClick={() => handleStatusChange(match.id, status)}
+                        className={`${theme.btnChip} ${
+                          match.status === status
+                            ? "bg-lime-400 text-stone-950"
+                            : "bg-stone-900 text-stone-400 ring-1 ring-stone-700 hover:bg-stone-800 hover:text-amber-100"
+                        } disabled:opacity-50`}
+                      >
+                        {status === "open" ? "Abrir" : "Fechar"}
+                      </button>
+                    ))}
+
+                    {!isFinished && !showScoreForm && (
+                      <button
+                        type="button"
+                        onClick={() => openScoreForm(match.id)}
+                        className={`${theme.btnChip} bg-lime-950/60 text-lime-400 ring-1 ring-lime-800/60 hover:bg-lime-950`}
+                      >
+                        Finalizar
+                      </button>
+                    )}
+
+                    {hasScore && !showScoreForm && (
+                      <button
+                        type="button"
+                        onClick={() => openScoreForm(match.id)}
+                        className={`${theme.btnChip} bg-stone-900 text-amber-100 ring-1 ring-stone-700 hover:bg-stone-800`}
+                      >
+                        Editar placar
+                      </button>
+                    )}
+
+                    {scorePending && !showScoreForm && (
+                      <button
+                        type="button"
+                        onClick={() => openScoreForm(match.id)}
+                        className={`${theme.btnChip} bg-amber-950/60 text-amber-200 ring-1 ring-amber-800/60 hover:bg-amber-950`}
+                      >
+                        Lançar resultado
+                      </button>
+                    )}
+                  </div>
+
+                  {showScoreForm && (
+                    <MatchScoreEntryForm
+                      match={match}
+                      action={finishAction}
+                      pending={finishPending}
+                      state={
+                        scoringMatchId === match.id || scorePending
+                          ? finishState
+                          : initialState
+                      }
+                      submitLabel={
+                        hasScore ? "Salvar placar" : "Finalizar partida"
+                      }
+                      onCancel={
+                        scorePending
+                          ? undefined
+                          : () => setScoringMatchId(null)
+                      }
                     />
-                    <p className={theme.meta}>
-                      {formatMatchDate(match.match_date)} ·{" "}
-                      {formatCurrencyBRL(match.cost_brl)}
-                    </p>
-                    {scorePending && (
-                      <p className="text-xs font-semibold text-amber-300">
-                        Placar pendente — lance o resultado
-                      </p>
-                    )}
-                    {matchHasFinalScore(match) && (
-                      <p className="text-xs font-medium text-stone-400">
-                        Resultado: {match.home_score} × {match.away_score}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1.5">
-                    <StatusBadge status={match.status} />
-                    {scorePending && (
-                      <span className="inline-flex items-center rounded-full bg-amber-950 px-2.5 py-0.5 text-xs font-semibold text-amber-300 ring-1 ring-inset ring-amber-800">
-                        Placar pendente
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {(["open", "closed", "finished"] as const).map((status) => (
-                    <button
-                      key={status}
-                      type="button"
-                      disabled={statusPending || match.status === status}
-                      onClick={() => handleStatusChange(match.id, status)}
-                      className={`${theme.btnChip} ${
-                        match.status === status
-                          ? "bg-lime-400 text-stone-950"
-                          : "bg-stone-900 text-stone-400 ring-1 ring-stone-700 hover:bg-stone-800 hover:text-amber-100"
-                      } disabled:opacity-50`}
-                    >
-                      {status === "open"
-                        ? "Abrir"
-                        : status === "closed"
-                          ? "Fechar"
-                          : "Finalizar"}
-                    </button>
-                  ))}
-                </div>
-              </div>
               );
             })}
           </div>
@@ -338,111 +514,6 @@ export function AdminPanel({ matches, users, payments }: AdminPanelProps) {
           <span>Pix pendente</span>
           <span>Pix enviado</span>
         </div>
-      </section>
-
-      {/* Result entry */}
-      <section className="rounded-2xl border border-stone-700 bg-gradient-to-b from-stone-900 to-stone-950 p-4 shadow-lg ring-1 ring-lime-500/10">
-        <h2 className="mb-1 text-base font-bold text-amber-100">
-          Lançar resultado
-        </h2>
-        <p className={`mb-3 ${theme.subheading}`}>
-          Informe o placar final. A pontuação é calculada e quem tiver mais
-          pontos vira vencedor da rodada.
-        </p>
-
-        <form action={finishAction} className="space-y-3">
-          <label htmlFor="finish-match" className={theme.label}>
-            Partida
-          </label>
-          <select
-            id="finish-match"
-            name="match_id"
-            required
-            value={finishMatchId}
-            onChange={(e) => setFinishMatchId(e.target.value)}
-            className={theme.select}
-          >
-            <option value="">Selecione a partida</option>
-            {finishableMatches.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {formatTeamName(m.home_team)} vs {formatTeamName(m.away_team)}
-                  {matchScorePending(m) ? " (placar pendente)" : ""}
-                </option>
-              ))}
-          </select>
-
-          {finishMatch && (
-            <div className="flex items-center justify-center gap-4 sm:gap-8">
-              <div className="flex flex-col items-center gap-3">
-                <label
-                  htmlFor="finish-home-score"
-                  className="flex flex-col items-center"
-                >
-                  <TeamLabel
-                    name={finishMatch.home_team}
-                    size="sm"
-                    layout="stacked"
-                    className="font-semibold text-stone-200"
-                  />
-                </label>
-                <input
-                  id="finish-home-score"
-                  name="home_score"
-                  type="number"
-                  min={0}
-                  max={20}
-                  required
-                  defaultValue={0}
-                  className={theme.scoreInput}
-                />
-              </div>
-              <span
-                className="shrink-0 text-2xl font-light text-stone-500"
-                aria-hidden
-              >
-                ×
-              </span>
-              <div className="flex flex-col items-center gap-3">
-                <label
-                  htmlFor="finish-away-score"
-                  className="flex flex-col items-center"
-                >
-                  <TeamLabel
-                    name={finishMatch.away_team}
-                    size="sm"
-                    layout="stacked"
-                    className="font-semibold text-stone-200"
-                  />
-                </label>
-                <input
-                  id="finish-away-score"
-                  name="away_score"
-                  type="number"
-                  min={0}
-                  max={20}
-                  required
-                  defaultValue={0}
-                  className={theme.scoreInput}
-                />
-              </div>
-            </div>
-          )}
-
-          {finishState.error && (
-            <p className="text-xs text-red-300">{finishState.error}</p>
-          )}
-          {finishState.success && (
-            <p className="text-xs text-lime-400">{finishState.success}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={finishPending || !finishMatchId}
-            className={`${theme.btnPrimary} w-full`}
-          >
-            {finishPending ? "Finalizando..." : "Finalizar partida"}
-          </button>
-        </form>
       </section>
     </div>
   );

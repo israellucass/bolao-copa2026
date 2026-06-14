@@ -95,7 +95,7 @@ export async function createMatch(
 
 export async function updateMatchStatus(
   matchId: string,
-  status: "open" | "closed" | "finished"
+  status: "open" | "closed"
 ): Promise<AdminState> {
   await requireAdmin();
 
@@ -153,9 +153,11 @@ export async function finishMatchWithScore(
     Number.isNaN(homeScore) ||
     Number.isNaN(awayScore) ||
     homeScore < 0 ||
-    awayScore < 0
+    awayScore < 0 ||
+    homeScore > 20 ||
+    awayScore > 20
   ) {
-    return { error: "Placar final inválido." };
+    return { error: "Placar final inválido (0–20)." };
   }
 
   const { error: matchError } = await supabase
@@ -168,7 +170,7 @@ export async function finishMatchWithScore(
     .eq("id", matchId);
 
   if (matchError) {
-    return { error: "Não foi possível finalizar a partida." };
+    return { error: "Não foi possível salvar o resultado." };
   }
 
   await recalculateMatchPoints(matchId, homeScore, awayScore);
@@ -176,5 +178,5 @@ export async function finishMatchWithScore(
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/ranking");
-  return { success: "Partida finalizada! Pontuação e vencedor(es) definidos." };
+  return { success: "Resultado salvo! Pontuação e vencedor(es) atualizados." };
 }
